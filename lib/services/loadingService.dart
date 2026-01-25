@@ -23,7 +23,7 @@ Widget customLoaderEasyloading() {
     alignment: Alignment.center,
     children: [
       _DashedCircularLoader(),
-      Image.asset('assets/logos/loading.gif', height: 7.5.h),
+      Image.asset('assets/icons/logo.png', height: 7.5.h),
     ],
   );
 }
@@ -35,7 +35,7 @@ class _DashedCircularLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 5),
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 3500),
       builder: (context, value, child) {
         return Transform.rotate(
           angle: value * 6.28,

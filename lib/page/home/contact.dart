@@ -88,16 +88,7 @@ class ContactPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 1.h),
-                    textFieldWithPrefixSuffuxIconAndHintText(
-                      "Write here".tr,
-
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
-                      bColor: Colors.transparent,
-                    ),
+                    textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
                     SizedBox(height: 2.h),
                     Text(
                       "Email",
@@ -108,16 +99,7 @@ class ContactPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 1.h),
-                    textFieldWithPrefixSuffuxIconAndHintText(
-                      "Write here".tr,
-
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
-                      bColor: Colors.transparent,
-                    ),
+                    textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
                     SizedBox(height: 2.h),
                     Text(
                       "Subject",
@@ -128,16 +110,7 @@ class ContactPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 1.h),
-                    textFieldWithPrefixSuffuxIconAndHintText(
-                      "Write here".tr,
-
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
-                      bColor: Colors.transparent,
-                    ),
+                    textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
                     SizedBox(height: 2.h),
 
                     Text(
@@ -152,13 +125,7 @@ class ContactPage extends StatelessWidget {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Write here".tr,
 
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
                       line: 5,
-
-                      bColor: Colors.transparent,
                     ),
                     SizedBox(height: 4.h),
                     gradientButton(

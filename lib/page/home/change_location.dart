@@ -36,12 +36,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
               textFieldWithPrefixSuffuxIconAndHintText(
                 "Enter Location",
 
-                fillColor: Color(0xffF8F8F8),
-                mainTxtColor: Colors.black,
                 obsecure: false,
-                radius: 16,
-
-                bColor: Colors.transparent,
               ),
               SizedBox(height: 3.h),
               gradientButton(

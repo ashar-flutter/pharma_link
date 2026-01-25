@@ -116,16 +116,7 @@ class AddNewJobState extends State<AddNewJob> {
                         fontWeight: FontWeight.w500,
                       ),
                       SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText(
-                        "Write here".tr,
-
-                        fillColor: Color(0xffF8F8F8),
-
-                        radius: 16,
-                        padd: 16,
-
-                        bColor: Colors.transparent,
-                      ),
+                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
                       SizedBox(height: 2.h),
                       Row(
                         children: [
@@ -162,16 +153,7 @@ class AddNewJobState extends State<AddNewJob> {
                         fontWeight: FontWeight.w500,
                       ),
                       SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText(
-                        "Write here".tr,
-
-                        fillColor: Color(0xffF8F8F8),
-
-                        radius: 16,
-                        padd: 16,
-
-                        bColor: Colors.transparent,
-                      ),
+                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
 
                       SizedBox(height: 2.h),
 
@@ -189,15 +171,9 @@ class AddNewJobState extends State<AddNewJob> {
                         child: textFieldWithPrefixSuffuxIconAndHintText(
                           "Select".tr,
 
-                          fillColor: Color(0xffF6F6F6),
-
-                          radius: 16,
                           enable: false,
-                          padd: 16,
 
                           suffixIcon: "assets/icons/date.png",
-
-                          bColor: Colors.transparent,
                         ),
                       ),
                       SizedBox(height: 2.h),
@@ -212,13 +188,7 @@ class AddNewJobState extends State<AddNewJob> {
                       textFieldWithPrefixSuffuxIconAndHintText(
                         "Write here".tr,
 
-                        fillColor: Color(0xffF8F8F8),
-
-                        radius: 16,
                         line: 5,
-                        padd: 16,
-
-                        bColor: Colors.transparent,
                       ),
 
                       SizedBox(height: 2.h),
@@ -230,16 +200,7 @@ class AddNewJobState extends State<AddNewJob> {
                         fontWeight: FontWeight.w500,
                       ),
                       SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText(
-                        "Write here".tr,
-
-                        fillColor: Color(0xffF8F8F8),
-
-                        radius: 16,
-                        padd: 16,
-
-                        bColor: Colors.transparent,
-                      ),
+                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
 
                       SizedBox(height: 6.h),
                       gradientButton(

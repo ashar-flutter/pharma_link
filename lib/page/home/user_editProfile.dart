@@ -126,14 +126,7 @@ class UserEditprofileState extends State<UserEditprofile> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your name".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/images/user.png",
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
                         text_widget(
@@ -146,14 +139,7 @@ class UserEditprofileState extends State<UserEditprofile> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your name".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/images/user.png",
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
                         text_widget(
@@ -166,14 +152,7 @@ class UserEditprofileState extends State<UserEditprofile> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your email".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/icons/s2.png",
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
 
@@ -186,13 +165,6 @@ class UserEditprofileState extends State<UserEditprofile> {
                         SizedBox(height: 0.8.h),
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your city".tr,
-
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
                         text_widget(
@@ -226,13 +198,6 @@ class UserEditprofileState extends State<UserEditprofile> {
                         SizedBox(height: 0.8.h),
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your experience".tr,
-
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
                         text_widget(
@@ -245,13 +210,7 @@ class UserEditprofileState extends State<UserEditprofile> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write here".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
                           line: 5,
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 3.h),
                         Center(child: Image.asset("assets/icons/upl.png")),

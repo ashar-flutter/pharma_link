@@ -30,7 +30,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                height: 90.h,
+                height: 88.h,
                 width: Get.width,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -74,7 +74,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                     Column(
                       children: [
                         RoleSelectCard(
-                          index: 0,
+                          index: 1,
                           selectedIndex: currentUser.userType,
                           title: "I am a Pharmacist/Student/Assistant",
                           subtitle:
@@ -82,7 +82,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                           leftIcon: "assets/images/as40.png",
                           onTap: () {
                             setState(() {
-                              currentUser.userType = 0;
+                              currentUser.userType = 1;
                             });
                             Future.delayed(Duration(milliseconds: 300), () {
                               Get.to(LoginPage());
@@ -91,7 +91,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                         ),
                         SizedBox(height: 2.h),
                         RoleSelectCard(
-                          index: 1,
+                          index: 2,
                           selectedIndex: currentUser.userType,
                           title: "I am Pharmacy Owner",
                           subtitle:
@@ -99,7 +99,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                           leftIcon: "assets/images/as50.png",
                           onTap: () {
                             setState(() {
-                              currentUser.userType = 1;
+                              currentUser.userType = 2;
                             });
                             Future.delayed(Duration(milliseconds: 300), () {
                               Get.to(LoginPage());

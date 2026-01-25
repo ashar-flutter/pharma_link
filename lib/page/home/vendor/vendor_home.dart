@@ -216,7 +216,7 @@ class _VendorHomeState extends State<VendorHome> {
                             ),
                             onPress(
                               ontap: () =>
-                                  Get.to(PharmacyDetails(isEdit: true)),
+                                  Get.to(PharmacyAdd(isEdit: true)),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 12,

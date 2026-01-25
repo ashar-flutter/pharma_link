@@ -88,14 +88,8 @@ class ChangePasswordState extends State<ChangePassword> {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Write your password".tr,
 
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
                       prefixIcon: "assets/icons/s3.png",
 
-                      bColor: Colors.transparent,
                       obsecure: true,
                     ),
                     SizedBox(height: 2.h),
@@ -109,14 +103,8 @@ class ChangePasswordState extends State<ChangePassword> {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Write your password".tr,
 
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
                       prefixIcon: "assets/icons/s3.png",
 
-                      bColor: Colors.transparent,
                       obsecure: true,
                     ),
                     SizedBox(height: 2.h),
@@ -130,14 +118,8 @@ class ChangePasswordState extends State<ChangePassword> {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Write your password".tr,
 
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
                       prefixIcon: "assets/icons/s3.png",
 
-                      bColor: Colors.transparent,
                       obsecure: true,
                     ),
                     SizedBox(height: 14.h),

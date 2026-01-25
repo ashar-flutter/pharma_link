@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:linkpharma/page/auth/splash_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           defaultTransition: Transition.fadeIn,
+          builder: EasyLoading.init(),
           locale: const Locale('en', 'US'),
           transitionDuration: const Duration(milliseconds: 300),
           theme: ThemeData(

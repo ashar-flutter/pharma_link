@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
+import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -77,6 +78,6 @@ Widget _buildErrorWidget(double? width, double? height, {String url = ""}) {
     color: Colors.grey[300],
     width: width,
     height: height,
-    child: Icon(Icons.person, size: 20),
+    child: Center(child: text_widget("File is attached!!", color: Colors.grey)),
   );
 }

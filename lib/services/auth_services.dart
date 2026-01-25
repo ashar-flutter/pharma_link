@@ -32,6 +32,7 @@ class AuthServices {
       }
       return "error";
     } on FirebaseAuthException catch (error) {
+      logger.e(error);
       return error.message ?? error.code;
     }
   }
@@ -107,29 +108,17 @@ class AuthServices {
   Future<void> checkUser() async {
     User? fbUser = FirebaseAuth.instance.currentUser;
     if (fbUser != null) {
-      // currentUser = await FirestoreServices.I.getUser(fbUser.uid);
-      // if (currentUser.enable == false) {
-      //   await logOut();
-      //   showToast(
-      //     ToastType.success,
-      //     "Account Blocked",
-      //     "Your account is blocked contact to the support.",
-      //   );
-      // }
-      // if (currentUser.loginDeviceId !=
-      //     LocalStorage.I.getValue(LocalStorageKeys.deviceId)) {
-      //   await logOut();
-      //   showToast(
-      //     ToastType.info,
-      //     "Warring!",
-      //     "Your account is login on another device",
-      //   );
-      // }
+      currentUser = await FirestoreServices.I.getUser(fbUser.uid);
+      if (currentUser.enable == false) {
+        await logOut();
+        EasyLoading.showInfo("Your account is blocked contact to the support.");
+      }
     }
   }
 
   Future<void> logOut() async {
     await _auth.signOut();
+    currentUser = UserModel();
   }
 
   Future<bool> loginWithGoogle() async {

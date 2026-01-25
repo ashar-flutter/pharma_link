@@ -115,15 +115,9 @@ class FilterPageState extends State<FilterPage> {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Select".tr,
 
-                      fillColor: Color(0xffF6F6F6),
-
-                      radius: 16,
                       enable: false,
-                      padd: 16,
 
                       suffixIcon: "assets/icons/loc.png",
-
-                      bColor: Colors.transparent,
                     ),
 
                     SizedBox(height: 2.h),
@@ -312,16 +306,9 @@ class FilterPageState extends State<FilterPage> {
 
                       child: textFieldWithPrefixSuffuxIconAndHintText(
                         "Select".tr,
-
-                        fillColor: Color(0xffF6F6F6),
-
-                        radius: 16,
                         enable: false,
-                        padd: 16,
 
                         suffixIcon: "assets/icons/date.png",
-
-                        bColor: Colors.transparent,
                       ),
                     ),
                     Spacer(),

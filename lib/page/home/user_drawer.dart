@@ -10,11 +10,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/page/auth/login_page.dart';
+import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/home/bottom_nav.dart';
 import 'package:linkpharma/page/home/contact.dart';
 import 'package:linkpharma/page/home/notification.dart';
 import 'package:linkpharma/page/home/privacy.dart';
 import 'package:linkpharma/page/home/savedpage.dart';
+import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 
 import 'package:remixicon/remixicon.dart';
@@ -181,10 +183,42 @@ class _UserDrawerState extends State<UserDrawer> {
                                       children: [
                                         InkWell(
                                           onTap: () async {
+                                            // show dialog to logout
                                             Get.find<UserDrawerController>()
                                                 .closeDrawer();
-
-                                            Get.offAll(LoginPage());
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text("Logout"),
+                                                  content: const Text(
+                                                    "Are you sure you want to logout?",
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text(
+                                                        "Cancel",
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        await AuthServices.I
+                                                            .logOut();
+                                                        Get.offAll(
+                                                          SelectRolePage(),
+                                                        );
+                                                      },
+                                                      child: const Text(
+                                                        "Logout",
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(

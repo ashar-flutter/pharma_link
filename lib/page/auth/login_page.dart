@@ -9,6 +9,7 @@ import 'package:linkpharma/controller/auth_controller.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/auth/forgot_password.dart';
 import 'package:linkpharma/page/auth/signup_user_page.dart';
+import 'package:linkpharma/page/home/pharmaceydetail.dart';
 import 'package:linkpharma/page/home/user_drawer.dart';
 import 'package:linkpharma/page/home/vendor/pharmacy_add.dart';
 import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
@@ -19,7 +20,6 @@ import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:roundcheckbox/roundcheckbox.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -99,14 +99,10 @@ class LoginPage extends StatelessWidget {
                             SizedBox(height: 0.8.h),
                             textFieldWithPrefixSuffuxIconAndHintText(
                               "Write your email".tr,
-                              fillColor: Color(0xffF8F8F8),
-                              radius: 16,
-                              padd: 16,
+                              controller: con.emailController,
                               prefixIcon: Icons.email_outlined,
-                              bColor: Colors.transparent,
                             ),
                             SizedBox(height: 2.h),
-
                             text_widget(
                               "Password",
                               color: Colors.black,
@@ -116,12 +112,9 @@ class LoginPage extends StatelessWidget {
                             SizedBox(height: 0.8.h),
                             textFieldWithPrefixSuffuxIconAndHintText(
                               "Write your password".tr,
-                              fillColor: Color(0xffF8F8F8),
+                              controller: con.passwordController,
                               inputAction: TextInputAction.done,
-                              radius: 16,
-                              padd: 16,
                               prefixIcon: Icons.lock_outline_rounded,
-                              bColor: Colors.transparent,
                               obsecure: true,
                             ),
                             SizedBox(height: 2.h),
@@ -141,10 +134,9 @@ class LoginPage extends StatelessWidget {
                                 ),
                                 SizedBox(width: 3.w),
                                 onPress(
-                                  ontap: () {},
+                                  ontap: () => con.rememberMe = !con.rememberMe,
                                   child: text_widget(
                                     "Remember me",
-
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w300,
                                   ),
@@ -167,11 +159,7 @@ class LoginPage extends StatelessWidget {
                             gradientButton(
                               "Login",
                               width: Get.width,
-                              ontap: () async {
-                                currentUser.role == 1
-                                    ? Get.offAll(UserDrawer())
-                                    : Get.offAll(VendorDrawer());
-                              },
+                              ontap: () => con.loginWithEmail(context),
                               height: 5.5,
                               isColor: true,
                               font: 16,
@@ -181,9 +169,9 @@ class LoginPage extends StatelessWidget {
                             Center(
                               child: onPress(
                                 ontap: () {
-                                  // currentUser.role == 1
-                                  //     ? Get.to(SignupUserPage())
-                                  //     : Get.to(PharmacyAdd(isEdit: false));
+                                  currentUser.userType == 1
+                                      ? Get.to(SignupUserPage())
+                                      : Get.to(PharmacyAdd(isEdit: false));
                                 },
                                 child: RichText(
                                   text: TextSpan(

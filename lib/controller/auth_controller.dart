@@ -25,7 +25,7 @@ class AuthController extends GetxController {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController cityController = TextEditingController();
-  TextEditingController roleController = TextEditingController();
+  String? role;
   TextEditingController experienceController = TextEditingController();
   TextEditingController rppsController = TextEditingController();
   File? profileImage, cv;
@@ -42,10 +42,13 @@ class AuthController extends GetxController {
   Future<void> loginWithEmail(BuildContext context) async {
     if (!emailController.text.isEmail) {
       EasyLoading.showInfo("Please enter a valid email address");
+      return;
     }
     if (passwordController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a password");
+      return;
     }
+    LoadingService.I.show(context);
     String error = await AuthServices.I.emailSignIn(
       context,
       emailController.text,
@@ -71,45 +74,59 @@ class AuthController extends GetxController {
   Future<void> signUpUserEmail(BuildContext context) async {
     if (profileImage == null) {
       EasyLoading.showInfo("Please select a profile image");
+      return;
     }
     if (firstNameController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a first name");
+      return;
     }
     if (lastNameController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a last name");
+      return;
     }
     if (!emailController.text.isEmail) {
       EasyLoading.showInfo("Please enter a valid email");
+      return;
     }
     if (passwordController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a password");
+      return;
     }
     if (passwordController.text.length < 7) {
       EasyLoading.showInfo("Choose a strong password");
+      return;
     }
     if (reEnterPasswordController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a re-enter password");
+      return;
     }
     if (passwordController.text != reEnterPasswordController.text) {
       EasyLoading.showInfo("Passwords do not match");
+      return;
     }
     if (cityController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a city");
+      return;
     }
-    if (roleController.text.isEmpty) {
-      EasyLoading.showInfo("Please enter a role");
+    if (role == null) {
+      EasyLoading.showInfo("Select the role");
+      return;
     }
     if (experienceController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a experience");
+      return;
     }
     if (rppsController.text.isEmpty) {
       EasyLoading.showInfo("Please enter a rpps");
+      return;
     }
     if (descriptionController.text.isEmpty) {
       EasyLoading.showInfo("Enter a description about yourself");
+      return;
     }
     if (cv == null) {
       EasyLoading.showInfo("Please select a cv");
+      return;
     }
     LoadingService.I.show(context);
     currentUser.image = await FirestorageServices.I.uploadImage(
@@ -120,12 +137,12 @@ class AuthController extends GetxController {
     currentUser.lastName = lastNameController.text;
     currentUser.email = emailController.text;
     currentUser.city = cityController.text;
-    currentUser.role = roleController.text;
+    currentUser.role = role!;
     currentUser.experience = experienceController.text;
     currentUser.rpps = rppsController.text;
     currentUser.description = descriptionController.text;
     currentUser.cv = await FirestorageServices.I.uploadFile(cv!, "cvs");
-    String error = await AuthServices.I.emailSignIn(
+    String error = await AuthServices.I.emailSignUp(
       context,
       emailController.text,
       passwordController.text,
@@ -251,7 +268,7 @@ class AuthController extends GetxController {
     }
     await FirestoreServices.I.addUser(currentUser);
     LoadingService.I.dismiss();
-    Get.to(PharmacyDetails(isEdit: false));
+    Get.to(PharmacyAdd(isEdit: false));
   }
 
   Future<void> loginWithGoogle(BuildContext context) async {
@@ -286,10 +303,10 @@ class AuthController extends GetxController {
     UserModel user = await FirestoreServices.I.getUser(currentUser.id);
     LoadingService.I.dismiss();
     if (user.id == "") {
-      if (currentUser.userType == 0) {
+      if (currentUser.userType == 1) {
         Get.to(SignupUserPage());
       } else {
-        Get.to(PharmacyDetails(isEdit: false));
+        Get.to(PharmacyAdd(isEdit: false));
       }
     } else {
       currentUser = user;
@@ -298,7 +315,7 @@ class AuthController extends GetxController {
         AuthServices.I.logOut();
         return;
       }
-      if (currentUser.userType == 0) {
+      if (currentUser.userType == 1) {
         Get.to(UserDrawer());
       } else {
         Get.to(VendorDrawer());
@@ -311,6 +328,7 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please enter a valid email");
       return;
     }
+    LoadingService.I.show(context);
     await AuthServices.I.forgetPassword(context, emailController.text);
     Get.back();
   }

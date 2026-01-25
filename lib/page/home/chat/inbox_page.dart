@@ -99,14 +99,7 @@ class InboxPage1State extends State<InboxPage1> {
                     textFieldWithPrefixSuffuxIconAndHintText(
                       "Write text here".tr,
 
-                      fillColor: Color(0xffF6F6F6),
-
-                      radius: 16,
-                      padd: 16,
-
                       prefixIcon: "assets/icons/ss1.png",
-
-                      bColor: Colors.transparent,
                     ),
                     SizedBox(height: 2.4.h),
                     ...List.generate(4, (index) {

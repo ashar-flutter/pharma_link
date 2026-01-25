@@ -90,16 +90,7 @@ class AddOwnerState extends State<AddOwner> {
                       fontWeight: FontWeight.w500,
                     ),
                     SizedBox(height: 0.8.h),
-                    textFieldWithPrefixSuffuxIconAndHintText(
-                      "Write here".tr,
-
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
-                      bColor: Colors.transparent,
-                    ),
+                    textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
                     SizedBox(height: 2.h),
                     text_widget(
                       "Surname",
@@ -108,16 +99,7 @@ class AddOwnerState extends State<AddOwner> {
                       fontWeight: FontWeight.w500,
                     ),
                     SizedBox(height: 0.8.h),
-                    textFieldWithPrefixSuffuxIconAndHintText(
-                      "Write here".tr,
-
-                      fillColor: Color(0xffF8F8F8),
-
-                      radius: 16,
-                      padd: 16,
-
-                      bColor: Colors.transparent,
-                    ),
+                    textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
 
                     SizedBox(height: 14.h),
                     gradientButton(

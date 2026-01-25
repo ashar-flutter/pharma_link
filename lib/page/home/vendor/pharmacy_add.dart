@@ -10,15 +10,15 @@ import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class PharmacyDetails extends StatefulWidget {
+class PharmacyAdd extends StatefulWidget {
   final bool isEdit;
-  const PharmacyDetails({super.key, this.isEdit = true});
+  const PharmacyAdd({super.key, this.isEdit = true});
 
   @override
-  State<PharmacyDetails> createState() => PharmacyDetailsState();
+  State<PharmacyAdd> createState() => PharmacyAddState();
 }
 
-class PharmacyDetailsState extends State<PharmacyDetails> {
+class PharmacyAddState extends State<PharmacyAdd> {
   int Selectindex = 0;
 
   @override
@@ -27,86 +27,76 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
       resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.primary,
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
-      body: Column(
+      body: Stack(
         children: [
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Column(
-                children: [
-                  Row(
+          if (!widget.isEdit)
+            Image.asset(
+              "assets/images/bbg.png",
+              width: Get.width,
+              height: Get.height,
+              fit: BoxFit.cover,
+            ),
+          Column(
+            children: [
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: Column(
                     children: [
-                      widget.isEdit
-                          ? onPress(
-                              ontap: () {
-                                Get.back();
-                              },
-                              child: Image.asset(
-                                "assets/images/as24.png",
-                                height: 4.h,
-                              ),
-                            )
-                          : Selectindex == 0
-                          ? Image.asset("assets/images/as24.png", height: 4.h)
-                          : onPress(
-                              ontap: () {
-                                if (Selectindex == 1) {
-                                  setState(() {
-                                    Selectindex = 0;
-                                  });
-                                } else if (Selectindex == 2) {
-                                  setState(() {
-                                    Selectindex = 1;
-                                  });
-                                }
-                              },
-                              child: Image.asset(
-                                "assets/images/as24.png",
-                                height: 4.h,
-                              ),
+                      Row(
+                        children: [
+                          onPress(
+                            ontap: () {
+                              Get.back();
+                            },
+                            child: Image.asset(
+                              "assets/images/as24.png",
+                              height: 3.5.h,
                             ),
-                      Spacer(),
-                      text_widget(
-                        widget.isEdit ? "Edit Details" : "Pharmacy Details",
-                        color: Colors.white,
-                        fontSize: 21.sp,
-                      ),
-                      Spacer(),
-                      Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
-                        color: Colors.transparent,
+                          ),
+                          Spacer(),
+                          text_widget(
+                            widget.isEdit ? "Edit Details" : "Pharmacy Details",
+                            color: Colors.white,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          Spacer(),
+                          Image.asset(
+                            "assets/images/as24.png",
+                            height: 3.5.h,
+                            color: Colors.transparent,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 2.h),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
                 ),
               ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Selectindex == 0
-                      ? page1()
-                      : Selectindex == 1
-                      ? page2()
-                      : page3(),
+              SizedBox(height: 2.h),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Selectindex == 0
+                          ? page1()
+                          : Selectindex == 1
+                          ? page2()
+                          : page3(),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -126,16 +116,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
         SizedBox(height: 2.h),
         text_widget(
           "Address",
@@ -144,16 +125,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
         SizedBox(height: 2.h),
         text_widget(
           "Postal Code",
@@ -162,13 +134,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-          fillColor: Color(0xffF8F8F8),
-          radius: 16,
-          padd: 16,
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
         SizedBox(height: 2.h),
         text_widget(
           "City",
@@ -180,11 +146,6 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write here".tr,
           prefixIcon: "assets/icons/loc.png",
-          fillColor: Color(0xffF8F8F8),
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -197,11 +158,6 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write here".tr,
           prefixIcon: "assets/icons/loc.png",
-          fillColor: Color(0xffF8F8F8),
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -214,14 +170,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your email".tr,
 
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
           prefixIcon: "assets/icons/s2.png",
-
-          bColor: Colors.transparent,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -234,14 +183,8 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your password".tr,
 
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
           prefixIcon: "assets/icons/s3.png",
 
-          bColor: Colors.transparent,
           obsecure: true,
         ),
         SizedBox(height: 2.h),
@@ -255,14 +198,8 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your password".tr,
 
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
           prefixIcon: "assets/icons/s3.png",
 
-          bColor: Colors.transparent,
           obsecure: true,
         ),
         SizedBox(height: 4.h),
@@ -311,17 +248,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-          line: 5,
-
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr, line: 5),
         SizedBox(height: 1.h),
         Divider(thickness: 0.3),
         SizedBox(height: 1.h),
@@ -361,13 +288,6 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
             Expanded(
               child: textFieldWithPrefixSuffuxIconAndHintText(
                 "Service Name".tr,
-
-                fillColor: Color(0xffF8F8F8),
-
-                radius: 16,
-                padd: 16,
-
-                bColor: Colors.transparent,
               ),
             ),
             SizedBox(width: 3.w),
@@ -381,13 +301,6 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
             Expanded(
               child: textFieldWithPrefixSuffuxIconAndHintText(
                 "Service Name".tr,
-
-                fillColor: Color(0xffF8F8F8),
-
-                radius: 16,
-                padd: 16,
-
-                bColor: Colors.transparent,
               ),
             ),
             SizedBox(width: 3.w),
@@ -440,16 +353,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
         SizedBox(height: 2.h),
 
         text_widget(
@@ -459,16 +363,7 @@ class PharmacyDetailsState extends State<PharmacyDetails> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write here".tr,
-
-          fillColor: Color(0xffF8F8F8),
-
-          radius: 16,
-          padd: 16,
-
-          bColor: Colors.transparent,
-        ),
+        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
         SizedBox(height: 4.h),
         gradientButton(
           "Add Owner",

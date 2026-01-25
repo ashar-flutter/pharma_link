@@ -36,6 +36,13 @@ dependencies:
   firebase_auth: ^5.7.0
   firebase_core: ^3.15.2
   firebase_pagination: ^4.1.0
+  image_picker:
+  path:
+  wechat_camera_picker:
+  wechat_assets_picker:
+  croppy:
+  image:
+  file_picker:
 
 dev_dependencies:
   flutter_test:

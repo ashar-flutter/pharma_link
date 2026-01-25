@@ -41,6 +41,7 @@ Widget customDropDown(
   BuildContext context,
   String? selectedValue,
   ValueChanged<String?> onChanged, {
+  IconData? icon,
   double? textHeight,
   double radius = 18,
 }) {
@@ -56,10 +57,9 @@ Widget customDropDown(
     padding: EdgeInsets.symmetric(horizontal: 16),
     child: Theme(
       data: Theme.of(context).copyWith(
-        splashColor: Colors.transparent, // remove splash
-        highlightColor: Colors.transparent, // remove highlight
-        hoverColor: Colors.transparent, // remove hover
-        // selectedRowColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(

@@ -18,13 +18,11 @@ Widget textFieldWithPrefixSuffuxIconAndHintText(
   bool isEmail = false,
   double? radius,
   double? padd,
-  fillColor,
-  bColor,
-  mainTxtColor,
-  hintColor,
   Function? ontap,
   Function? ontapPrefix,
   TextInputAction inputAction = TextInputAction.next,
+  TextInputType keyboardType = TextInputType.text,
+  List<TextInputFormatter>? inputFormatters,
   Function? ontapSuffix,
   bool obsecure = false,
 }) {
@@ -34,21 +32,8 @@ Widget textFieldWithPrefixSuffuxIconAndHintText(
       return TextField(
         maxLines: line,
         textInputAction: inputAction,
-        keyboardType: isEmail && hintText.contains("email")
-            ? TextInputType.emailAddress
-            : hintText == 'Zip Code' ||
-                  hintText == 'Enter Zip Code' ||
-                  hintText == 'Enter Phone Number'
-            ? TextInputType.number
-            : null,
-        inputFormatters: hintText == 'Zip Code' || hintText == 'Enter Zip Code'
-            ? [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(5),
-              ]
-            : hintText.contains("Phone Number")
-            ? [FilteringTextInputFormatter.digitsOnly]
-            : [],
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         onChanged: (value) {
           if (ontap != null) {
             ontap();
@@ -57,16 +42,14 @@ Widget textFieldWithPrefixSuffuxIconAndHintText(
         enabled: enable,
         obscureText: obsecureVisible,
         controller: controller,
-        style: GoogleFonts.plusJakartaSans(
-          color: mainTxtColor ?? Colors.black54,
-          fontSize: 15.sp,
-        ),
+        style: GoogleFonts.plusJakartaSans(fontSize: 15.sp),
         decoration: InputDecoration(
           hintText: hintText,
+          alignLabelWithHint: true,
           hintStyle: GoogleFonts.plusJakartaSans(
             fontSize: 13.7.sp,
             fontWeight: FontWeight.w400,
-            color: hintColor ?? Colors.black54,
+            color: Colors.black54,
           ),
 
           suffixIconConstraints: BoxConstraints(),
@@ -142,6 +125,7 @@ Widget textFieldWithPrefixSuffuxIconAndHintText(
           prefixIconConstraints: BoxConstraints(
             minWidth: prefixIcon != null ? 12.w : 5.w,
           ),
+
           prefixIcon:
               prefixIcon is String &&
                   !prefixIcon.isLocalPath &&
@@ -188,24 +172,18 @@ Widget textFieldWithPrefixSuffuxIconAndHintText(
                 )
               : const SizedBox(),
           filled: true,
-          fillColor: fillColor ?? Color(0xffF7F7F7),
+          fillColor: Color(0xffF7F7F7),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(radius ?? 35),
-            borderSide: BorderSide(
-              color: bColor ?? Colors.transparent,
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(radius ?? 16),
+            borderSide: BorderSide(color: Colors.transparent, width: 1),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(radius ?? 35),
-            borderSide: BorderSide(
-              color: bColor ?? Color(0xffE6DCCD),
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(radius ?? 16),
+            borderSide: BorderSide(color: Colors.transparent, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(radius ?? 35),
-            borderSide: BorderSide(color: MyColors.primary, width: 1),
+            borderRadius: BorderRadius.circular(radius ?? 16),
+            borderSide: BorderSide(color: MyColors.primary, width: 1.5),
           ),
         ),
       );

@@ -127,14 +127,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write here".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/images/user.png",
-
-                          bColor: Colors.transparent,
                         ),
 
                         SizedBox(height: 2.h),
@@ -149,14 +142,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your name".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/images/user.png",
-
-                          bColor: Colors.transparent,
                         ),
                         SizedBox(height: 2.h),
 
@@ -170,14 +156,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your email".tr,
 
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
                           prefixIcon: "assets/icons/s2.png",
-
-                          bColor: Colors.transparent,
                         ),
 
                         SizedBox(height: 2.h),
@@ -191,13 +170,6 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                         SizedBox(height: 0.8.h),
                         textFieldWithPrefixSuffuxIconAndHintText(
                           "Write your city".tr,
-
-                          fillColor: Color(0xffF8F8F8),
-
-                          radius: 16,
-                          padd: 16,
-
-                          bColor: Colors.transparent,
                         ),
 
                         SizedBox(height: 12.h),

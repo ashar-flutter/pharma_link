@@ -125,13 +125,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                         child: textFieldWithPrefixSuffuxIconAndHintText(
                           'Type message here....'.tr,
 
-                          fillColor: MyColors.primary,
-
                           radius: 40,
                           padd: 14,
-                          bColor: Colors.transparent,
 
-                          hintColor: Colors.white,
                           prefixIcon: "assets/icons/link.png",
                         ),
                       ),

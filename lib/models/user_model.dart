@@ -6,7 +6,7 @@ class UserModel {
   String email = "";
   String language = "en";
   String loginType = "email";
-  int userType = 0;
+  int userType = 1;
   String rpps = "";
 
   // User
