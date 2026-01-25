@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Linkpharma</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>linkpharma</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+
+
+		<key>NSAppleMusicUsageDescription</key>
+		<string>This app requires to access your music library to show music on profile and send via chat</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>This app requires to access your calendar to show events</string>
+		<key>NSCameraUsageDescription</key>
+		<string>This app requires to access your camera to take photos and videos</string>
+		<key>NSContactsUsageDescription</key>
+		<string>This app requires to access your contacts to show contacts</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app uses your location to provide better recommendations.</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>Your location is required even in the background for accurate results.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app needs access to your location to show nearby data.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>This app requires to access your microphone to record video with your voice send via chat</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>This app requires to access your photo library to show image on profile and send via chat</string>
+		<key>NSRemindersUsageDescription</key>
+		<string>This app requires to access your reminders to show reminders</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>fb3231595837017226</string>
+					<string>com.googleusercontent.apps.967396999605-ub2m57r17cjb3vs8oe2upj1r8938f6hh</string>
+				</array>
+			</dict>
+		</array>
+		<!-- Other configurations -->
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>fb</string>
+			<string>fbapi</string>
+			<string>fb-messenger-api</string>
+			<string>fb-messenger-share-api</string>
+			<string>fbauth2</string>
+			<string>fbshareextension</string>
+			<string>google</string>
+			<string>googlechrome</string>
+			<string>googleusercontent</string>
+		</array>
+		<!-- Facebook Configuration -->
+		<key>FacebookAppID</key>
+		<string>3231595837017226</string>
+		<key>FacebookClientToken</key>
+		<string>3cd49560dfa9a7dad35e03dc28c5a8ac</string>
+		<key>FacebookDisplayName</key>
+		<string>Linkpharma</string>
+
+
+</dict>
+</plist>

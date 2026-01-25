@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "226663839481",
+    "project_id": "linkpharma-127",
+    "storage_bucket": "linkpharma-127.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226663839481:android:dec2bbc90fb0e6175c1428",
+        "android_client_info": {
+          "package_name": "com.linkpharma"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "226663839481-chlut42to7n73grpt5aghu27ap64i8sj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBndC3DczaM-o3zqRFn2CF7nJqbIGx5VlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "226663839481-chlut42to7n73grpt5aghu27ap64i8sj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
