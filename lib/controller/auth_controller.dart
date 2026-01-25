@@ -36,8 +36,14 @@ class AuthController extends GetxController {
   TextEditingController zipCodeController = TextEditingController();
   TextEditingController siretController = TextEditingController();
   List<Map<String, dynamic>> owners = []; // {id, name, image, surename}
-  List<File> images = [];
+  List<dynamic> images = [
+    {'type': 'add'},
+  ];
   List<String> services = [];
+
+  int selectIndex = 0;
+
+  ScrollController scrollController = ScrollController();
 
   Future<void> loginWithEmail(BuildContext context) async {
     if (!emailController.text.isEmail) {
@@ -157,8 +163,8 @@ class AuthController extends GetxController {
   }
 
   void page1() {
-    if (lastNameController.text.isEmpty) {
-      EasyLoading.showInfo("Please enter a last name");
+    if (firstNameController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter a pharmacy name");
       return;
     }
     if (addressController.text.isEmpty) {
@@ -201,23 +207,17 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please enter a siret");
       return;
     }
-    if (images.isEmpty) {
-      EasyLoading.showInfo("Please add at least one image");
-      return;
-    }
-    if (services.isEmpty) {
-      EasyLoading.showInfo("Please add at least one service");
-      return;
-    }
-    if (descriptionController.text.isEmpty) {
-      EasyLoading.showInfo("Enter a description about yourself");
-      return;
-    }
-    // Get.toNamed(AppRoutes.page2);;
+    selectIndex = 1;
+    update();
+    scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
-  void page2() {
-    if (images.isEmpty) {
+  void page2(BuildContext context) {
+    if (images.length < 2) {
       EasyLoading.showInfo("Please add at least one image");
       return;
     }
@@ -229,7 +229,14 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please add at least one service");
       return;
     }
-    // Get.toNamed(AppRoutes.page2);
+    // selectIndex = 2;
+    // update();
+    // scrollController.animateTo(
+    //   0,
+    //   duration: Duration(milliseconds: 300),
+    //   curve: Curves.easeOut,
+    // );
+    signUpVendorEmail(context);
   }
 
   void page3(BuildContext context) {
@@ -250,9 +257,15 @@ class AuthController extends GetxController {
     currentUser.email = emailController.text;
     currentUser.siret = siretController.text;
     currentUser.images = await Future.wait(
-      images.map(
-        (File image) => FirestorageServices.I.uploadImage(image, "pharmacies"),
-      ),
+      images
+          .where((img) => img['type'] == 'image')
+          .map(
+            (img) => FirestorageServices.I.uploadImage(
+              File(img['path']),
+              "pharmacies",
+            ),
+          )
+          .toList(),
     );
     currentUser.description = descriptionController.text;
     currentUser.services = services;
@@ -268,7 +281,7 @@ class AuthController extends GetxController {
     }
     await FirestoreServices.I.addUser(currentUser);
     LoadingService.I.dismiss();
-    Get.to(PharmacyAdd(isEdit: false));
+    Get.offAll(VendorDrawer());
   }
 
   Future<void> loginWithGoogle(BuildContext context) async {

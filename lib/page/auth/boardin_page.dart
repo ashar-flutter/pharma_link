@@ -182,27 +182,6 @@ class _BoardingPageState extends State<BoardingPage> {
               ],
             ),
           ),
-          // Positioned.fill(
-          //   right: 5.w,
-          //   child: Align(
-          //     alignment: Alignment.topRight,
-          //     child: SafeArea(
-          //       child: Material(
-          //         color: Colors.transparent,
-          //         child: onPress(
-          //           ontap: () {
-          //             Get.offAll(LoginPage());
-          //           },
-          //           child: text_widget(
-          //             "Skip",
-          //             color: MyColors.primary,
-          //             fontSize: 15.6.sp,
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

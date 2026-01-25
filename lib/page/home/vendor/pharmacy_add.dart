@@ -1,114 +1,120 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/config/supportFunctions.dart';
+import 'package:linkpharma/controller/auth_controller.dart';
 import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
+import 'package:path/path.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class PharmacyAdd extends StatefulWidget {
+class PharmacyAdd extends StatelessWidget {
   final bool isEdit;
   const PharmacyAdd({super.key, this.isEdit = true});
-
-  @override
-  State<PharmacyAdd> createState() => PharmacyAddState();
-}
-
-class PharmacyAddState extends State<PharmacyAdd> {
-  int Selectindex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.primary,
-
-      body: Stack(
-        children: [
-          if (!widget.isEdit)
-            Image.asset(
-              "assets/images/bbg.png",
-              width: Get.width,
-              height: Get.height,
-              fit: BoxFit.cover,
-            ),
-          Column(
+      body: GetBuilder<AuthController>(
+        builder: (con) {
+          return Stack(
             children: [
-              SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: Column(
-                    children: [
-                      Row(
+              if (!isEdit)
+                Image.asset(
+                  "assets/images/bbg.png",
+                  width: Get.width,
+                  height: Get.height,
+                  fit: BoxFit.cover,
+                ),
+              Column(
+                children: [
+                  SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Column(
                         children: [
-                          onPress(
-                            ontap: () {
-                              Get.back();
-                            },
-                            child: Image.asset(
-                              "assets/images/as24.png",
-                              height: 3.5.h,
-                            ),
-                          ),
-                          Spacer(),
-                          text_widget(
-                            widget.isEdit ? "Edit Details" : "Pharmacy Details",
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          Spacer(),
-                          Image.asset(
-                            "assets/images/as24.png",
-                            height: 3.5.h,
-                            color: Colors.transparent,
+                          Row(
+                            children: [
+                              onPress(
+                                ontap: () {
+                                  if (con.selectIndex == 0) {
+                                    Get.back();
+                                    return;
+                                  }
+                                  con.selectIndex--;
+                                  con.update();
+                                },
+                                child: Image.asset(
+                                  "assets/images/as24.png",
+                                  height: 3.5.h,
+                                ),
+                              ),
+                              Spacer(),
+                              text_widget(
+                                isEdit ? "Edit Details" : "Pharmacy Details",
+                                color: Colors.white,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              Spacer(),
+                              Image.asset(
+                                "assets/images/as24.png",
+                                height: 3.5.h,
+                                color: Colors.transparent,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
                     ),
                   ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Selectindex == 0
-                          ? page1()
-                          : Selectindex == 1
-                          ? page2()
-                          : page3(),
+                  SizedBox(height: 2.h),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        controller: con.scrollController,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: con.selectIndex == 0
+                              ? page1(con)
+                              : con.selectIndex == 1
+                              ? page2(context, con)
+                              : page3(context, con),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Column page1() {
+  Column page1(AuthController con) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 1.h),
-
         text_widget(
           "Pharmacy Name",
           color: Colors.black,
@@ -116,7 +122,10 @@ class PharmacyAddState extends State<PharmacyAdd> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          controller: con.firstNameController,
+        ),
         SizedBox(height: 2.h),
         text_widget(
           "Address",
@@ -125,7 +134,10 @@ class PharmacyAddState extends State<PharmacyAdd> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          controller: con.addressController,
+        ),
         SizedBox(height: 2.h),
         text_widget(
           "Postal Code",
@@ -134,7 +146,10 @@ class PharmacyAddState extends State<PharmacyAdd> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          controller: con.zipCodeController,
+        ),
         SizedBox(height: 2.h),
         text_widget(
           "City",
@@ -145,7 +160,7 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write here".tr,
-          prefixIcon: "assets/icons/loc.png",
+          controller: con.cityController,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -157,7 +172,7 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write here".tr,
-          prefixIcon: "assets/icons/loc.png",
+          controller: con.countryController,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -169,8 +184,7 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your email".tr,
-
-          prefixIcon: "assets/icons/s2.png",
+          controller: con.emailController,
         ),
         SizedBox(height: 2.h),
         text_widget(
@@ -182,9 +196,7 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your password".tr,
-
-          prefixIcon: "assets/icons/s3.png",
-
+          controller: con.passwordController,
           obsecure: true,
         ),
         SizedBox(height: 2.h),
@@ -197,20 +209,26 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your password".tr,
-
-          prefixIcon: "assets/icons/s3.png",
-
+          controller: con.reEnterPasswordController,
           obsecure: true,
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 2.h),
+        text_widget(
+          "SIRET",
+          color: Colors.black,
+          fontSize: 13.4.sp,
+          fontWeight: FontWeight.w500,
+        ),
+        SizedBox(height: 0.8.h),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write your password".tr,
+          controller: con.siretController,
+        ),
+        SizedBox(height: 3.h),
         gradientButton(
           "Next",
           width: Get.width,
-          ontap: () async {
-            setState(() {
-              Selectindex = 1;
-            });
-          },
+          ontap: () => con.page1(),
           height: 5.5,
           isColor: true,
           font: 16,
@@ -221,34 +239,111 @@ class PharmacyAddState extends State<PharmacyAdd> {
     );
   }
 
-  Column page2() {
+  Column page2(BuildContext context, AuthController con) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 2.h),
+        SizedBox(height: 1.h),
         Wrap(
           alignment: WrapAlignment.center,
           runAlignment: WrapAlignment.center,
           runSpacing: 20,
           spacing: 20,
-          children: [
-            Image.asset("assets/icons/add.png", height: 12.4.h),
-            Image.asset("assets/icons/iimg.png", height: 12.4.h),
-            Image.asset("assets/icons/iimg.png", height: 12.4.h),
-            Image.asset("assets/icons/iimg.png", height: 12.4.h),
-            Image.asset("assets/icons/iimg.png", height: 12.4.h),
-            Image.asset("assets/icons/iimg.png", height: 12.4.h),
-          ],
+          children: con.images.asMap().entries.map((entry) {
+            int index = entry.key;
+            dynamic item = entry.value;
+            if (item['type'] == 'add') {
+              return GestureDetector(
+                onTap: () async {
+                  File? file = await SupportFunctions.I.getImage(
+                    context: context,
+                  );
+                  if (file != null) {
+                    con.images.add({'path': file.path, 'type': 'image'});
+                  }
+                  con.update();
+                },
+                child: Container(
+                  height: 12.4.h,
+                  width: 12.4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add, size: 28, color: Colors.grey.shade600),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 12.4.h,
+                    width: 12.4.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: AssetImage(item['path']),
+                        fit: BoxFit.cover,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: -10,
+                    right: -10,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (con.images[index]['type'] == 'image') {
+                          con.images.removeAt(index);
+                          con.update();
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(color: Colors.black26, blurRadius: 3),
+                          ],
+                        ),
+                        padding: EdgeInsets.all(6),
+                        child: Icon(Icons.close, size: 14, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          }).toList(),
         ),
         SizedBox(height: 2.h),
         text_widget(
           "Pharmacy description",
           color: Colors.black,
-          fontSize: 13.4.sp,
+          fontSize: 15.5.sp,
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr, line: 5),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          line: 4,
+          controller: con.descriptionController,
+        ),
         SizedBox(height: 1.h),
         Divider(thickness: 0.3),
         SizedBox(height: 1.h),
@@ -261,53 +356,128 @@ class PharmacyAddState extends State<PharmacyAdd> {
               fontWeight: FontWeight.w500,
             ),
             Spacer(),
-            Container(
-              alignment: Alignment.center,
-              height: 3.h,
-              width: 23.w,
-              decoration: BoxDecoration(
-                color: Color(0xff10B66D),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Text(
-                "Add More",
-                style: GoogleFonts.plusJakartaSans(
-                  color: Color(0xffFFFFFF),
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold,
+            onPress(
+              ontap: () {
+                TextEditingController singleServiceController =
+                    TextEditingController();
+                Get.bottomSheet(
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        text_widget(
+                          "Add Service",
+                          color: Colors.black,
+                          fontSize: 15.5.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          children: [
+                            SizedBox(width: 3.w),
+                            Expanded(
+                              child: textFieldWithPrefixSuffuxIconAndHintText(
+                                "Write here".tr,
+                                controller: singleServiceController,
+                              ),
+                            ),
+                            SizedBox(width: 2.w),
+                            onPress(
+                              ontap: () {
+                                if (singleServiceController.text != "") {
+                                  con.services.add(
+                                    singleServiceController.text,
+                                  );
+                                  singleServiceController.clear();
+                                  con.update();
+                                  Get.back();
+                                }
+                              },
+                              child: Container(
+                                height: 5.5.h,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: MyColors.primary,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: text_widget(
+                                  "   Add   ",
+                                  color: Colors.white,
+                                  fontSize: 15.5.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 3.w),
+                          ],
+                        ),
+                        SizedBox(height: 5.h),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                alignment: Alignment.center,
+                height: 3.h,
+                width: 23.w,
+                decoration: BoxDecoration(
+                  color: Color(0xff10B66D),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Text(
+                  "Add More",
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Color(0xffFFFFFF),
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ],
         ),
+        if (con.services.isNotEmpty) ...[
+          SizedBox(height: 2.h),
+          Column(
+            children: con.services.map((service) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: textFieldWithPrefixSuffuxIconAndHintText(
+                        "Service Name".tr,
+                        enable: false,
+                        controller: TextEditingController(text: service),
+                      ),
+                    ),
+                    SizedBox(width: 3.w),
+                    InkWell(
+                      onTap: () {
+                        con.services.removeAt(con.services.indexOf(service));
+                        con.update();
+                      },
+                      child: Image.asset("assets/icons/del.png", height: 4.h),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ] else ...[
+          SizedBox(height: 1.h),
+        ],
 
-        SizedBox(height: 2.h),
-
-        Row(
-          children: [
-            Expanded(
-              child: textFieldWithPrefixSuffuxIconAndHintText(
-                "Service Name".tr,
-              ),
-            ),
-            SizedBox(width: 3.w),
-            Image.asset("assets/icons/del.png", height: 4.h),
-          ],
-        ),
-        SizedBox(height: 2.h),
-
-        Row(
-          children: [
-            Expanded(
-              child: textFieldWithPrefixSuffuxIconAndHintText(
-                "Service Name".tr,
-              ),
-            ),
-            SizedBox(width: 3.w),
-            Image.asset("assets/icons/del.png", height: 4.h),
-          ],
-        ),
-        SizedBox(height: 2.h),
         Divider(thickness: 0.3),
         SizedBox(height: 2.h),
         Wokring(),
@@ -315,11 +485,7 @@ class PharmacyAddState extends State<PharmacyAdd> {
         gradientButton(
           "Next",
           width: Get.width,
-          ontap: () async {
-            setState(() {
-              Selectindex = 2;
-            });
-          },
+          ontap: () => con.page2(context),
           height: 5.5,
           isColor: true,
           font: 16,
@@ -330,12 +496,14 @@ class PharmacyAddState extends State<PharmacyAdd> {
     );
   }
 
-  Column page3() {
+  Column page3(BuildContext context, AuthController con) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController sureNameController = TextEditingController();
+    File? file;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 2.h),
-
         text_widget(
           "Add New Owner",
           color: Colors.black,
@@ -345,7 +513,6 @@ class PharmacyAddState extends State<PharmacyAdd> {
         SizedBox(height: 2.h),
         Center(child: Image.asset("assets/icons/pp.png", height: 13.h)),
         SizedBox(height: 2.h),
-
         text_widget(
           "Name",
           color: Colors.black,
@@ -353,7 +520,10 @@ class PharmacyAddState extends State<PharmacyAdd> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          controller: nameController,
+        ),
         SizedBox(height: 2.h),
 
         text_widget(
@@ -363,7 +533,10 @@ class PharmacyAddState extends State<PharmacyAdd> {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write here".tr,
+          controller: sureNameController,
+        ),
         SizedBox(height: 4.h),
         gradientButton(
           "Add Owner",
@@ -451,14 +624,11 @@ class PharmacyAddState extends State<PharmacyAdd> {
             ),
           ],
         ),
-
         SizedBox(height: 4.h),
         gradientButton(
           "Save",
           width: Get.width,
-          ontap: () async {
-            Get.offAll(VendorDrawer());
-          },
+          ontap: () => con.page3(context),
           height: 5.5,
           isColor: true,
           font: 16,
@@ -531,7 +701,7 @@ class WokringState extends State<Wokring> {
 
   @override
   Widget build(BuildContext context) {
-    return buildOpeningHoursSection();
+    return buildOpeningHoursSection(context);
   }
 
   Future<void> _selectTime(
@@ -574,7 +744,7 @@ class WokringState extends State<Wokring> {
     }
   }
 
-  Widget buildOpeningHoursSection() {
+  Widget buildOpeningHoursSection(BuildContext context) {
     List<String> dayNames = [
       "Monday",
       "Tuesday",
@@ -606,7 +776,7 @@ class WokringState extends State<Wokring> {
             children: List.generate(7, (index) {
               return Column(
                 children: [
-                  _buildDayRow(dayNames[index], index),
+                  _buildDayRow(context, dayNames[index], index),
                   if (index < 6) _buildDivider(),
                 ],
               );
@@ -618,7 +788,7 @@ class WokringState extends State<Wokring> {
   }
 
   // Helper widget for each day
-  Widget _buildDayRow(String day, int index) {
+  Widget _buildDayRow(BuildContext context, String day, int index) {
     bool isOpen = workingTimeModel.days[index]["isOpen"];
     TimeOfDay start = workingTimeModel.days[index]["start"];
     TimeOfDay end = workingTimeModel.days[index]["end"];

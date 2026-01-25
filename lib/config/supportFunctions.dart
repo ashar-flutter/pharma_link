@@ -189,7 +189,7 @@ class SupportFunctions {
         textTheme: CupertinoTextThemeData(primaryColor: MyColors.white),
       ),
       heroTag: 'image',
-      allowedAspectRatios: [CropAspectRatio(height: 1, width: 2)],
+      allowedAspectRatios: [CropAspectRatio(height: 1, width: 1)],
       cropPathFn: isCircleCrop ? circleCropShapeFn : aabbCropShapeFn,
       showLoadingIndicatorOnSubmit: true,
     );

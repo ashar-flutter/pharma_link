@@ -9,10 +9,7 @@ import 'package:linkpharma/controller/auth_controller.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/auth/forgot_password.dart';
 import 'package:linkpharma/page/auth/signup_user_page.dart';
-import 'package:linkpharma/page/home/pharmaceydetail.dart';
-import 'package:linkpharma/page/home/user_drawer.dart';
 import 'package:linkpharma/page/home/vendor/pharmacy_add.dart';
-import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
@@ -206,21 +203,35 @@ class LoginPage extends StatelessWidget {
                             Row(
                               children: [
                                 Spacer(),
-                                Image.asset(
-                                  "assets/icons/so1.png",
-                                  height: 5.h,
+                                onPress(
+                                  ontap: () {
+                                    con.loginWithFacebook(context);
+                                  },
+                                  child: Image.asset(
+                                    "assets/icons/so1.png",
+                                    height: 5.h,
+                                  ),
                                 ),
                                 SizedBox(width: 3.w),
-
-                                Image.asset(
-                                  "assets/icons/so2.png",
-                                  height: 5.h,
+                                onPress(
+                                  ontap: () {
+                                    con.loginWithGoogle(context);
+                                  },
+                                  child: Image.asset(
+                                    "assets/icons/so2.png",
+                                    height: 5.h,
+                                  ),
                                 ),
                                 if (GetPlatform.isIOS) ...[
                                   SizedBox(width: 3.w),
-                                  Image.asset(
-                                    "assets/icons/so3.png",
-                                    height: 5.h,
+                                  onPress(
+                                    ontap: () {
+                                      con.loginWithApple(context);
+                                    },
+                                    child: Image.asset(
+                                      "assets/icons/so3.png",
+                                      height: 5.h,
+                                    ),
                                   ),
                                 ],
                                 Spacer(),
