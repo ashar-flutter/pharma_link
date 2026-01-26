@@ -27,102 +27,105 @@ class PharmacyAdd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: MyColors.primary,
-      body: GetBuilder<AuthController>(
-        builder: (con) {
-          return Stack(
-            children: [
-              if (!isEdit)
-                Image.asset(
-                  "assets/images/bbg.png",
-                  width: Get.width,
-                  height: Get.height,
-                  fit: BoxFit.cover,
-                ),
-              Column(
-                children: [
-                  SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22),
-                      child: Column(
-                        children: [
-                          text_widget(
-                            isEdit ? "Edit Details" : "Pharmacy Details",
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w600,
+      resizeToAvoidBottomInset: true,
+      backgroundColor: MyColors.white,
+      body: onPress(
+        ontap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: GetBuilder<AuthController>(
+          builder: (con) {
+            return Stack(
+              children: [
+                if (!isEdit)
+                  Image.asset(
+                    "assets/images/bbg.png",
+                    width: Get.width,
+                    height: Get.height,
+                    fit: BoxFit.cover,
+                  ),
+                Column(
+                  children: [
+                    SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: Column(
+                          children: [
+                            text_widget(
+                              isEdit ? "Edit Details" : "Pharmacy Details",
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
                         ),
-                      ),
-                      child: SingleChildScrollView(
-                        controller: con.scrollController,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: con.selectIndex == 0
-                              ? page1(con)
-                              : con.selectIndex == 1
-                              ? page2(context, con)
-                              : page3(context, con),
+                        child: SingleChildScrollView(
+                          controller: con.scrollController,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: con.selectIndex == 0
+                                ? page1(con)
+                                : con.selectIndex == 1
+                                ? page2(context, con)
+                                : page3(context, con),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Positioned.fill(
-                left: 4.w,
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: SafeArea(
-                    child: onPress(
-                      ontap: () {
-                        if (currentUser.id.isEmpty) {
-                          if (con.selectIndex == 0) {
-                            Get.back();
+                  ],
+                ),
+                Positioned.fill(
+                  left: 4.w,
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: SafeArea(
+                      child: onPress(
+                        ontap: () {
+                          if (currentUser.id.isEmpty) {
+                            if (con.selectIndex == 0) {
+                              Get.back();
+                            } else {
+                              con.selectIndex--;
+                            }
+                            con.update();
                           } else {
-                            con.selectIndex--;
+                            showPopup(
+                              context,
+                              "Logout",
+                              "Are you sure you want to logout and leave the user profile?",
+                              "Cancel",
+                              "Logout",
+                              () => Get.back(),
+                              () async {
+                                await AuthServices.I.logOut();
+                                Get.offAll(SelectRolePage());
+                              },
+                            );
                           }
-                          con.update();
-                        } else {
-                          showPopup(
-                            context,
-                            "Logout",
-                            "Are you sure you want to logout and leave the user profile?",
-                            "Cancel",
-                            "Logout",
-                            () => Get.back(),
-                            () async {
-                              await AuthServices.I.logOut();
-                              Get.offAll(SelectRolePage());
-                            },
-                          );
-                        }
-                      },
-                      child: Image.asset(
-                        "assets/images/back.png",
-                        height: 3.5.h,
+                        },
+                        child: Image.asset(
+                          "assets/images/back.png",
+                          height: 3.5.h,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -193,6 +196,18 @@ class PharmacyAdd extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         text_widget(
+          "SIRET",
+          color: Colors.black,
+          fontSize: 13.4.sp,
+          fontWeight: FontWeight.w500,
+        ),
+        SizedBox(height: 0.8.h),
+        textFieldWithPrefixSuffuxIconAndHintText(
+          "Write your SIRET".tr,
+          controller: con.siretController,
+        ),
+        SizedBox(height: 2.h),
+        text_widget(
           "Email Address",
           color: Colors.black,
           fontSize: 13.4.sp,
@@ -201,6 +216,7 @@ class PharmacyAdd extends StatelessWidget {
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your email".tr,
+          enable: currentUser.id == "",
           controller: con.emailController,
         ),
         SizedBox(height: 2.h),
@@ -214,6 +230,7 @@ class PharmacyAdd extends StatelessWidget {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write your password".tr,
           controller: con.passwordController,
+          inputAction: TextInputAction.done,
           obsecure: true,
         ),
         SizedBox(height: 2.h),
@@ -225,21 +242,10 @@ class PharmacyAdd extends StatelessWidget {
         ),
         SizedBox(height: 0.8.h),
         textFieldWithPrefixSuffuxIconAndHintText(
-          "Write your password".tr,
+          "Write your password again".tr,
           controller: con.reEnterPasswordController,
+          inputAction: TextInputAction.done,
           obsecure: true,
-        ),
-        SizedBox(height: 2.h),
-        text_widget(
-          "SIRET",
-          color: Colors.black,
-          fontSize: 13.4.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        SizedBox(height: 0.8.h),
-        textFieldWithPrefixSuffuxIconAndHintText(
-          "Write your password".tr,
-          controller: con.siretController,
         ),
         SizedBox(height: 3.h),
         gradientButton(
@@ -359,6 +365,7 @@ class PharmacyAdd extends StatelessWidget {
         textFieldWithPrefixSuffuxIconAndHintText(
           "Write here".tr,
           line: 4,
+          inputAction: TextInputAction.done,
           controller: con.descriptionController,
         ),
         SizedBox(height: 1.h),
@@ -428,7 +435,7 @@ class PharmacyAdd extends StatelessWidget {
                             SizedBox(width: 3.w),
                           ],
                         ),
-                        SizedBox(height: 5.h),
+                        SizedBox(height: 1.h),
                       ],
                     ),
                   ),
@@ -489,7 +496,7 @@ class PharmacyAdd extends StatelessWidget {
         Divider(thickness: 0.3),
         SizedBox(height: 2.h),
         Wokring(),
-        SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
         gradientButton(
           "Next",
           width: Get.width,
@@ -564,7 +571,7 @@ class PharmacyAdd extends StatelessWidget {
           "Write here".tr,
           controller: sureNameController,
         ),
-        SizedBox(height: 3.h),
+        SizedBox(height: 2.h),
         gradientButton(
           "Add Owner",
           width: Get.width,
@@ -655,7 +662,7 @@ class PharmacyAdd extends StatelessWidget {
             );
           },
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
         gradientButton(
           "Save",
           width: Get.width,
@@ -665,7 +672,7 @@ class PharmacyAdd extends StatelessWidget {
           font: 16,
           clr: MyColors.primary,
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
       ],
     );
   }

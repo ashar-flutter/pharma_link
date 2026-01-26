@@ -15,6 +15,9 @@
 		694ABF20DBB6DE7B6BE23F70 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D3D425DA18FD4FF6C7C4290B /* GoogleService-Info.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		940E6CC22F269EA00045561A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 940E6CC12F269EA00045561A /* GoogleService-Info.plist */; };
+		94F980A72F2770D6006E67FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F980A62F2770D6006E67FD /* Foundation.framework */; };
+		94F980A92F2770DF006E67FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F980A82F2770DF006E67FD /* UIKit.framework */; };
+		94F980AB2F2770E9006E67FD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94F980AA2F2770E9006E67FD /* CoreFoundation.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -57,6 +60,9 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		940E6CC12F269EA00045561A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		940E6CC32F269F0A0045561A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		94F980A62F2770D6006E67FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		94F980A82F2770DF006E67FD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		94F980AA2F2770E9006E67FD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +83,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94F980AB2F2770E9006E67FD /* CoreFoundation.framework in Frameworks */,
+				94F980A92F2770DF006E67FD /* UIKit.framework in Frameworks */,
+				94F980A72F2770D6006E67FD /* Foundation.framework in Frameworks */,
 				4F6669AFB385133C20170D54 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -103,6 +112,9 @@
 		579C798340D5C1802BDC09FA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				94F980AA2F2770E9006E67FD /* CoreFoundation.framework */,
+				94F980A82F2770DF006E67FD /* UIKit.framework */,
+				94F980A62F2770D6006E67FD /* Foundation.framework */,
 				AA952CDA81AF5376DFB36318 /* Pods_Runner.framework */,
 				287E30CFFB26AF6055A39136 /* Pods_RunnerTests.framework */,
 			);

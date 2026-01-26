@@ -25,7 +25,7 @@ dependencies:
   uuid: ^4.5.2
   shimmer_animation: ^2.2.2+1
   cached_network_image: ^3.4.1
-  get_storage: ^2.1.1
+  get_secure_storage: ^1.0.5
   flutter_easyloading: ^3.0.5
   firebase_storage: ^13.0.6
   flutter_facebook_auth: ^7.1.5

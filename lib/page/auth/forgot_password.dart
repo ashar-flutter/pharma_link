@@ -17,6 +17,7 @@ class ForgotPassword extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GetBuilder<AuthController>(
           init: AuthController(),
@@ -41,67 +42,65 @@ class ForgotPassword extends StatelessWidget {
                           topRight: Radius.circular(30),
                         ),
                       ),
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 22.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 3.h),
-                              Center(
-                                child: Text(
-                                  "Forgot Password",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Color(0xff1E1E1E),
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 3.h),
+                            Center(
+                              child: Text(
+                                "Forgot Password",
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Color(0xff1E1E1E),
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 3),
-                              Center(
-                                child: Text(
-                                  "Enter email where we send reset password link",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Color.fromARGB(104, 30, 30, 30),
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                            ),
+                            SizedBox(height: 3),
+                            Center(
+                              child: Text(
+                                "Enter email where we send reset password link",
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Color.fromARGB(104, 30, 30, 30),
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              SizedBox(height: 4.h),
-                              Center(
-                                child: Image.asset(
-                                  "assets/images/logo.png",
-                                  height: 10.h,
-                                ),
+                            ),
+                            SizedBox(height: 3.h),
+                            Center(
+                              child: Image.asset(
+                                "assets/images/logo.png",
+                                height: 12.h,
                               ),
-                              SizedBox(height: 7.h),
-                              text_widget(
-                                "Email Address",
-                                color: Colors.black,
-                                fontSize: 13.4.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              SizedBox(height: 0.8.h),
-                              textFieldWithPrefixSuffuxIconAndHintText(
-                                "Write your email".tr,
-                                controller: con.emailController,
-                                prefixIcon: Icons.email_outlined,
-                              ),
-                              SizedBox(height: 4.h),
-                              gradientButton(
-                                "Send",
-                                width: Get.width,
-                                ontap: () => con.forgotPassword(context),
-                                height: 5.5,
-                                isColor: true,
-                                font: 16,
-                                clr: MyColors.primary,
-                              ),
-                              SizedBox(height: 4.h),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 3.h),
+                            text_widget(
+                              "Email Address",
+                              color: Colors.black,
+                              fontSize: 13.4.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            SizedBox(height: 0.8.h),
+                            textFieldWithPrefixSuffuxIconAndHintText(
+                              "Write your email".tr,
+                              controller: con.emailController,
+                              prefixIcon: Icons.email_outlined,
+                              inputAction: TextInputAction.done,
+                            ),
+                            SizedBox(height: 3.h),
+                            gradientButton(
+                              "Send",
+                              width: Get.width,
+                              ontap: () => con.forgotPassword(context),
+                              height: 5.5,
+                              isColor: true,
+                              font: 16,
+                              clr: MyColors.primary,
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -1,16 +1,17 @@
 import 'dart:convert';
-import 'package:get_storage/get_storage.dart';
+import 'package:get_secure_storage/get_secure_storage.dart';
 import 'package:linkpharma/config/global.dart';
 
-enum LocalStorageKeys { remeberLogin, welcomeCard, deviceId }
+enum LocalStorageKeys { remeberLogin }
 
 class LocalStorage {
-  final GetStorage _box = GetStorage();
+  final GetSecureStorage _box = GetSecureStorage(container: 'linkpharma');
   static final LocalStorage I = LocalStorage._();
   LocalStorage._();
 
   Future<void> init() async {
-    await GetStorage.init();
+    await GetSecureStorage.init(container: "linkpharma");
+    logger.i("LocalStorage initialized");
   }
 
   Future<void> setValue<T>(LocalStorageKeys key, T value) async {

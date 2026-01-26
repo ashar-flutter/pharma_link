@@ -13,6 +13,7 @@ import 'package:linkpharma/config/supportFunctions.dart';
 import 'package:linkpharma/models/user_model.dart';
 import 'package:linkpharma/page/auth/login_page.dart';
 import 'package:linkpharma/services/firestore_services.dart';
+import 'package:linkpharma/services/local_storage.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthServices {
@@ -125,16 +126,28 @@ class AuthServices {
   Future<void> checkUser() async {
     User? fbUser = FirebaseAuth.instance.currentUser;
     if (fbUser != null) {
-      currentUser = await FirestoreServices.I.getUser(fbUser.uid);
-      currentUser.id = fbUser.uid;
-      if (currentUser.enable == false) {
+      bool remeberLogin = LocalStorage.I.getValue(
+        LocalStorageKeys.remeberLogin,
+        true,
+      );
+      if (remeberLogin) {
+        currentUser = await FirestoreServices.I.getUser(fbUser.uid);
+        currentUser.id = fbUser.uid;
+        currentUser.email = fbUser.email ?? "";
+        if (currentUser.enable == false) {
+          await logOut();
+          EasyLoading.showInfo(
+            "Your account is blocked contact to the support.",
+          );
+        }
+      } else {
         await logOut();
-        EasyLoading.showInfo("Your account is blocked contact to the support.");
       }
     }
   }
 
   Future<void> logOut() async {
+    await LocalStorage.I.clear();
     await _auth.signOut();
     currentUser = UserModel();
   }

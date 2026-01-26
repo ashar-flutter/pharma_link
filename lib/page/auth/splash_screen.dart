@@ -13,8 +13,7 @@ import 'package:linkpharma/page/home/user_drawer.dart';
 import 'package:linkpharma/page/home/vendor/pharmacy_add.dart';
 import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/services/auth_services.dart';
-import 'package:path/path.dart';
-
+import 'package:linkpharma/services/local_storage.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -60,6 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await LocalStorage.I.init();
     await AuthServices.I.checkUser();
   }
 

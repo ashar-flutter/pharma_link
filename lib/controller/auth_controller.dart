@@ -13,13 +13,14 @@ import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/services/firestorage_services.dart';
 import 'package:linkpharma/services/firestore_services.dart';
 import 'package:linkpharma/services/loadingService.dart';
+import 'package:linkpharma/services/local_storage.dart';
 
 class AuthController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController reEnterPasswordController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  bool rememberMe = false;
+  bool rememberMe = true;
 
   // userSide
   TextEditingController firstNameController = TextEditingController();
@@ -40,10 +41,12 @@ class AuthController extends GetxController {
     {'type': 'add'},
   ];
   List<String> services = [];
-
   int selectIndex = 0;
-
   ScrollController scrollController = ScrollController();
+
+  AuthController() {
+    emailController.text = currentUser.email;
+  }
 
   Future<void> loginWithEmail(BuildContext context) async {
     if (!emailController.text.isEmail) {
@@ -70,6 +73,7 @@ class AuthController extends GetxController {
       return;
     }
     LoadingService.I.dismiss();
+    await LocalStorage.I.setValue(LocalStorageKeys.remeberLogin, rememberMe);
     if (currentUser.userType == 1) {
       Get.offAll(UserDrawer());
     } else {
@@ -161,6 +165,7 @@ class AuthController extends GetxController {
       }
     }
     await FirestoreServices.I.addUser(currentUser);
+    await LocalStorage.I.setValue(LocalStorageKeys.remeberLogin, true);
     LoadingService.I.dismiss();
     Get.offAll(UserDrawer());
   }
@@ -283,6 +288,7 @@ class AuthController extends GetxController {
         return;
       }
     }
+    await LocalStorage.I.setValue(LocalStorageKeys.remeberLogin, true);
     await FirestoreServices.I.addUser(currentUser);
     LoadingService.I.dismiss();
     Get.offAll(VendorDrawer());
@@ -291,7 +297,7 @@ class AuthController extends GetxController {
   Future<void> loginWithGoogle(BuildContext context) async {
     bool check = await AuthServices.I.loginWithGoogle();
     if (currentUser.id == "" || !check) {
-      AuthServices.I.logOut();
+      await AuthServices.I.logOut();
       return;
     }
     signUp(context);
@@ -300,7 +306,7 @@ class AuthController extends GetxController {
   Future<void> loginWithApple(BuildContext context) async {
     bool check = await AuthServices.I.loginWithApple();
     if (currentUser.id == "" || !check) {
-      AuthServices.I.logOut();
+      await AuthServices.I.logOut();
       return;
     }
     signUp(context);
@@ -309,7 +315,7 @@ class AuthController extends GetxController {
   Future<void> loginWithFacebook(BuildContext context) async {
     bool check = await AuthServices.I.loginWithFacebook();
     if (currentUser.id == "" || !check) {
-      AuthServices.I.logOut();
+      await AuthServices.I.logOut();
       return;
     }
     signUp(context);
@@ -319,6 +325,7 @@ class AuthController extends GetxController {
     LoadingService.I.show(context);
     UserModel user = await FirestoreServices.I.getUser(currentUser.id);
     LoadingService.I.dismiss();
+    await LocalStorage.I.setValue(LocalStorageKeys.remeberLogin, true);
     if (user.id == "") {
       if (currentUser.userType == 1) {
         Get.to(SignupUserPage());

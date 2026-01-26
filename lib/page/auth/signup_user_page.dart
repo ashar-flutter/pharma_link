@@ -23,7 +23,7 @@ class SignupUserPage extends StatelessWidget {
     return onPress(
       ontap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
         body: GetBuilder<AuthController>(
           init: AuthController(),
@@ -151,6 +151,7 @@ class SignupUserPage extends StatelessWidget {
                                   textFieldWithPrefixSuffuxIconAndHintText(
                                     "Write your email".tr,
                                     prefixIcon: Icons.email_outlined,
+                                    enable: currentUser.id == "",
                                     controller: con.emailController,
                                   ),
                                   SizedBox(height: 2.h),
