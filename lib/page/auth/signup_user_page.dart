@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/config/supportFunctions.dart';
 import 'package:linkpharma/controller/auth_controller.dart';
-import 'package:linkpharma/page/home/user_drawer.dart';
+import 'package:linkpharma/page/auth/select_role_page.dart';
+import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/image_widget.dart';
 import 'package:linkpharma/widgets/ontap.dart';
+import 'package:linkpharma/widgets/showPopup.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -53,7 +56,9 @@ class SignupUserPage extends StatelessWidget {
                           SizedBox(height: 3.h),
                           Center(
                             child: Text(
-                              "Register here",
+                              currentUser.id == ""
+                                  ? "Register here"
+                                  : "User Profile",
                               style: GoogleFonts.plusJakartaSans(
                                 color: Color(0xff1E1E1E),
                                 fontSize: 20.sp,
@@ -64,7 +69,9 @@ class SignupUserPage extends StatelessWidget {
                           SizedBox(height: 3),
                           Center(
                             child: Text(
-                              "Enter details for registration",
+                              currentUser.id == ""
+                                  ? "Enter details for registration"
+                                  : "Enter details for profile update",
                               style: GoogleFonts.plusJakartaSans(
                                 color: Color.fromARGB(104, 30, 30, 30),
                                 fontSize: 13.sp,
@@ -271,7 +278,9 @@ class SignupUserPage extends StatelessWidget {
                                   ),
                                   SizedBox(height: 3.h),
                                   gradientButton(
-                                    "Create Account",
+                                    currentUser.id == ""
+                                        ? "Create Account"
+                                        : "Update Profile",
                                     width: Get.width,
                                     ontap: () => con.signUpUserEmail(context),
                                     height: 5.5,
@@ -297,9 +306,27 @@ class SignupUserPage extends StatelessWidget {
                   child: SafeArea(
                     child: onPress(
                       ontap: () {
-                        Get.back();
+                        if (currentUser.id.isEmpty) {
+                          Get.back();
+                        } else {
+                          showPopup(
+                            context,
+                            "Logout",
+                            "Are you sure you want to logout and leave the user profile?",
+                            "Cancel",
+                            "Logout",
+                            () => Get.back(),
+                            () async {
+                              await AuthServices.I.logOut();
+                              Get.offAll(SelectRolePage());
+                            },
+                          );
+                        }
                       },
-                      child: Image.asset("assets/images/as24.png", height: 4.h),
+                      child: Image.asset(
+                        "assets/images/back.png",
+                        height: 3.5.h,
+                      ),
                     ),
                   ),
                 ),

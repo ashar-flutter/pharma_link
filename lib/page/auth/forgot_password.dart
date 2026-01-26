@@ -117,8 +117,8 @@ class ForgotPassword extends StatelessWidget {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                     ),

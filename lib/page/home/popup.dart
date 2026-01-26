@@ -114,7 +114,7 @@ void showApplyDialog(BuildContext context) {
                               hintText: "Write here",
                               counterText: "",
                             ),
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 14.sp,
                               color: const Color(0xff1E1E1E),
                             ),
@@ -124,7 +124,7 @@ void showApplyDialog(BuildContext context) {
                             right: 0,
                             child: Text(
                               "0/500",
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.sp,
                                 color: Colors.grey,
                               ),

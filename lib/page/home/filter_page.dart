@@ -27,7 +27,7 @@ class FilterPageState extends State<FilterPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
+      builder: (BuildContext context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
@@ -72,8 +72,8 @@ class FilterPageState extends State<FilterPage> {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -84,7 +84,7 @@ class FilterPageState extends State<FilterPage> {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
+                        "assets/images/back.png",
                         height: 3.5.h,
                         color: Colors.transparent,
                       ),

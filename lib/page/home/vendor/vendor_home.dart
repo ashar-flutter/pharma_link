@@ -161,11 +161,12 @@ class _VendorHomeState extends State<VendorHome> {
                             onPageChanged: (index) =>
                                 setState(() => currentIndex = index),
                             itemCount: 5,
-                            itemBuilder: (context, index) => Image.asset(
-                              "assets/images/as52.png",
-                              width: Get.width,
-                              fit: BoxFit.fill,
-                            ),
+                            itemBuilder: (BuildContext context, index) =>
+                                Image.asset(
+                                  "assets/images/as52.png",
+                                  width: Get.width,
+                                  fit: BoxFit.fill,
+                                ),
                           ),
                         ),
                         SizedBox(height: 1.5.h),
@@ -215,8 +216,7 @@ class _VendorHomeState extends State<VendorHome> {
                               ),
                             ),
                             onPress(
-                              ontap: () =>
-                                  Get.to(PharmacyAdd(isEdit: true)),
+                              ontap: () => Get.to(PharmacyAdd(isEdit: true)),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 12,

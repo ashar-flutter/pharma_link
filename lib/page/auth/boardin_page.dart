@@ -72,8 +72,8 @@ class _BoardingPageState extends State<BoardingPage> {
             },
             child: Image.asset(
               currentIndex == 0
-                  ? 'assets/images/board.png'
-                  : 'assets/images/b2.png',
+                  ? 'assets/images/boarding1.png'
+                  : 'assets/images/boarding2.png',
               key: ValueKey(currentIndex),
               fit: BoxFit.cover,
             ),

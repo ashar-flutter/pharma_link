@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -254,6 +255,91 @@ class SupportFunctions {
     await file.writeAsBytes(pngBytes);
 
     return file;
+  }
+
+  String getFirebaseErrorMessage(Object error) {
+    if (error is! FirebaseException) {
+      return 'Something went wrong. Please try again';
+    }
+
+    switch (error.code) {
+      // 🔐 AUTH
+      case 'invalid-email':
+        return 'Email is not valid';
+      case 'email-already-in-use':
+        return 'Email already exists';
+      case 'weak-password':
+        return 'Password is too weak';
+      case 'missing-email':
+        return 'Email cannot be empty';
+      case 'missing-password':
+        return 'Password cannot be empty';
+      case 'invalid-password':
+        return 'Invalid password format';
+      case 'user-not-found':
+        return 'No account found with this email';
+      case 'wrong-password':
+        return 'Incorrect password';
+      case 'invalid-credential':
+        return 'Invalid email or password';
+      case 'user-disabled':
+        return 'Account has been disabled';
+      case 'requires-recent-login':
+        return 'Please log in again';
+      case 'too-many-requests':
+        return 'Too many attempts. Try again later';
+      case 'operation-not-allowed':
+        return 'This sign-in method is disabled';
+
+      // 🔥 FIRESTORE
+      case 'permission-denied':
+        return 'You do not have permission to perform this action';
+      case 'not-found':
+        return 'Requested data not found';
+      case 'already-exists':
+        return 'Data already exists';
+      case 'deadline-exceeded':
+        return 'Request timed out';
+      case 'resource-exhausted':
+        return 'Too many requests. Please slow down';
+      case 'failed-precondition':
+        return 'Operation failed due to system state';
+      case 'aborted':
+        return 'Operation aborted. Please retry';
+      case 'out-of-range':
+        return 'Invalid data range';
+      case 'unavailable':
+        return 'Service temporarily unavailable';
+      case 'unauthenticated':
+        return 'Please sign in to continue';
+
+      // 📦 STORAGE
+      case 'object-not-found':
+        return 'File not found';
+      case 'bucket-not-found':
+        return 'Storage bucket not found';
+      case 'project-not-found':
+        return 'Project not found';
+      case 'quota-exceeded':
+        return 'Storage quota exceeded';
+      case 'unauthorized':
+        return 'You are not allowed to perform this action';
+      case 'retry-limit-exceeded':
+        return 'Operation failed. Please try again';
+      case 'invalid-checksum':
+        return 'Upload failed. Please try again';
+      case 'canceled':
+        return 'Operation cancelled';
+
+      // 🌐 COMMON
+      case 'network-request-failed':
+        return 'Network error. Check your connection';
+      case 'internal-error':
+        return 'Internal error. Please try again';
+
+      default:
+        return 'Something went wrong. Please try again';
+    }
   }
 }
 

@@ -38,8 +38,8 @@ class ContactPage extends StatelessWidget {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -50,8 +50,8 @@ class ContactPage extends StatelessWidget {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
+                        "assets/images/back.png",
+                        height: 3.5.h,
                         color: Colors.transparent,
                       ),
                     ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -47,7 +48,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 children: [
                   GestureDetector(
                     onTap: () => Get.back(),
-                    child: Image.asset("assets/images/as24.png", height: 4.h),
+                    child: Image.asset("assets/images/back.png", height: 3.5.h),
                   ),
                   const Spacer(),
                   text_widget(
@@ -57,8 +58,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                   const Spacer(),
                   Image.asset(
-                    "assets/images/as24.png",
-                    height: 4.h,
+                    "assets/images/back.png",
+                    height: 3.5.h,
                     color: Colors.transparent,
                   ),
                 ],
@@ -135,7 +136,7 @@ class _NotificationPageState extends State<NotificationPage> {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: primary ? const Color(0xff10B66D) : Colors.black,
@@ -207,7 +208,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -215,7 +216,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           ),
                           Text(
                             time,
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 12.sp,
                               color: Colors.black54,
                             ),
@@ -227,7 +228,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         desc,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 12.sp,
                           color: Colors.black45,
                         ),

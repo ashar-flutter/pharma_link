@@ -172,7 +172,7 @@ class LoginPage extends StatelessWidget {
                                 },
                                 child: RichText(
                                   text: TextSpan(
-                                    text: 'Don’t have an account? ',
+                                    text: 'Don’t have an account, ',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.sp,
                                       color: MyColors.black,
@@ -183,7 +183,7 @@ class LoginPage extends StatelessWidget {
                                         text: 'Create new Account?',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 14.sp,
-                                          color: MyColors.primary1,
+                                          color: MyColors.primary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -208,7 +208,7 @@ class LoginPage extends StatelessWidget {
                                     con.loginWithFacebook(context);
                                   },
                                   child: Image.asset(
-                                    "assets/icons/so1.png",
+                                    "assets/icons/facebook.png",
                                     height: 5.h,
                                   ),
                                 ),
@@ -218,7 +218,7 @@ class LoginPage extends StatelessWidget {
                                     con.loginWithGoogle(context);
                                   },
                                   child: Image.asset(
-                                    "assets/icons/so2.png",
+                                    "assets/icons/google.png",
                                     height: 5.h,
                                   ),
                                 ),
@@ -229,7 +229,7 @@ class LoginPage extends StatelessWidget {
                                       con.loginWithApple(context);
                                     },
                                     child: Image.asset(
-                                      "assets/icons/so3.png",
+                                      "assets/icons/apple.png",
                                       height: 5.h,
                                     ),
                                   ),
@@ -252,7 +252,7 @@ class LoginPage extends StatelessWidget {
                                       text: 'Terms',
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 13.4.sp,
-                                        color: MyColors.primary1,
+                                        color: MyColors.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                       recognizer: TapGestureRecognizer()
@@ -276,7 +276,7 @@ class LoginPage extends StatelessWidget {
                                       text: 'Conditions of Use',
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 13.4.sp,
-                                        color: MyColors.primary1,
+                                        color: MyColors.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                       recognizer: TapGestureRecognizer()
@@ -307,7 +307,10 @@ class LoginPage extends StatelessWidget {
                       ontap: () {
                         Get.offAll(SelectRolePage());
                       },
-                      child: Image.asset("assets/images/as24.png", height: 4.h),
+                      child: Image.asset(
+                        "assets/images/back.png",
+                        height: 3.5.h,
+                      ),
                     ),
                   ),
                 ),

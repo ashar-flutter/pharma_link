@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -30,8 +31,8 @@ class SavedPage extends StatelessWidget {
                     children: [
                       IconButton(
                         icon: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                         onPressed: () => Get.back(),
                       ),
@@ -43,8 +44,8 @@ class SavedPage extends StatelessWidget {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
+                        "assets/images/back.png",
+                        height: 3.5.h,
                         color: Colors.transparent,
                       ),
                     ],
@@ -74,7 +75,7 @@ class SavedPage extends StatelessWidget {
 
                   childAspectRatio: 0.85,
                 ),
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, index) {
                   return Stack(
                     children: [
                       Container(
@@ -103,7 +104,7 @@ class SavedPage extends StatelessWidget {
                               ),
                               child: Text(
                                 "Pharmacie du Centre",
-                                style: TextStyle(
+                                style: GoogleFonts.plusJakartaSans(
                                   color: const Color(0xff1E1E1E),
                                   fontSize: 15.sp,
                                   fontWeight: FontWeight.w500,
@@ -116,7 +117,7 @@ class SavedPage extends StatelessWidget {
                               ),
                               child: Text(
                                 "Pharmacist-Full Time,\nInternship, Assistant",
-                                style: TextStyle(
+                                style: GoogleFonts.plusJakartaSans(
                                   color: const Color.fromARGB(110, 30, 30, 30),
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,

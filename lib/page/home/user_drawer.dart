@@ -17,6 +17,7 @@ import 'package:linkpharma/page/home/notification.dart';
 import 'package:linkpharma/page/home/privacy.dart';
 import 'package:linkpharma/page/home/savedpage.dart';
 import 'package:linkpharma/services/auth_services.dart';
+import 'package:linkpharma/widgets/showPopup.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 
 import 'package:remixicon/remixicon.dart';
@@ -120,7 +121,7 @@ class _UserDrawerState extends State<UserDrawer> {
                                                 Get.find<UserDrawerController>()
                                                     .closeDrawer(),
                                             child: Image.asset(
-                                              "assets/images/as24.png",
+                                              "assets/images/back.png",
                                               height: 4.4.h,
                                             ),
                                           ),
@@ -183,40 +184,18 @@ class _UserDrawerState extends State<UserDrawer> {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            // show dialog to logout
                                             Get.find<UserDrawerController>()
                                                 .closeDrawer();
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Text("Logout"),
-                                                  content: const Text(
-                                                    "Are you sure you want to logout?",
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: const Text(
-                                                        "Cancel",
-                                                      ),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () async {
-                                                        await AuthServices.I
-                                                            .logOut();
-                                                        Get.offAll(
-                                                          SelectRolePage(),
-                                                        );
-                                                      },
-                                                      child: const Text(
-                                                        "Logout",
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
+                                            showPopup(
+                                              context,
+                                              "Logout",
+                                              "Are you sure you want to logout?",
+                                              "Cancel",
+                                              "Logout",
+                                              () => Get.back(),
+                                              () async {
+                                                await AuthServices.I.logOut();
+                                                Get.offAll(SelectRolePage());
                                               },
                                             );
                                           },
@@ -295,86 +274,87 @@ class _DrawerScreenState extends State<DrawerScreen> {
                             padding: EdgeInsets.symmetric(vertical: 80),
 
                             itemCount: titles.length,
-                            itemBuilder: (context, index) => InkWell(
-                              onTap: () {
-                                con.closeDrawer();
-                                if (index == 0) {
-                                  con.closeDrawer();
-                                }
+                            itemBuilder: (BuildContext context, index) =>
+                                InkWell(
+                                  onTap: () {
+                                    con.closeDrawer();
+                                    if (index == 0) {
+                                      con.closeDrawer();
+                                    }
 
-                                if (index == 1) {
-                                  Get.to(SavedPage());
-                                  con.closeDrawer();
-                                }
-                                if (index == 2) {
-                                  Get.to(NotificationPage());
-                                  con.closeDrawer();
-                                }
+                                    if (index == 1) {
+                                      Get.to(SavedPage());
+                                      con.closeDrawer();
+                                    }
+                                    if (index == 2) {
+                                      Get.to(NotificationPage());
+                                      con.closeDrawer();
+                                    }
 
-                                if (index == 3) {
-                                  Get.to(PrivacyPage());
-                                  con.closeDrawer();
-                                }
-                                if (index == 4) {
-                                  Get.to(ContactPage());
-                                  con.closeDrawer();
-                                }
+                                    if (index == 3) {
+                                      Get.to(PrivacyPage());
+                                      con.closeDrawer();
+                                    }
+                                    if (index == 4) {
+                                      Get.to(ContactPage());
+                                      con.closeDrawer();
+                                    }
 
-                                setState(() {});
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 6.0,
-                                ),
-                                child: Container(
-                                  height: 4.h,
-                                  width: 35.w,
-                                  decoration: BoxDecoration(
-                                    color: index == 0
-                                        ? Colors.white
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 4.w),
-                                      currentUser.language == 'en'
-                                          ? Image.asset(
-                                              images[index],
-                                              height: 2.h,
+                                    setState(() {});
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6.0,
+                                    ),
+                                    child: Container(
+                                      height: 4.h,
+                                      width: 35.w,
+                                      decoration: BoxDecoration(
+                                        color: index == 0
+                                            ? Colors.white
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(width: 4.w),
+                                          currentUser.language == 'en'
+                                              ? Image.asset(
+                                                  images[index],
+                                                  height: 2.h,
+                                                  color: index == 0
+                                                      ? MyColors.primary
+                                                      : Colors.white,
+                                                )
+                                              : SizedBox(),
+                                          currentUser.language == 'en'
+                                              ? SizedBox(width: 3.w)
+                                              : SizedBox(),
+                                          Text(
+                                            titles[index].tr,
+                                            style: GoogleFonts.plusJakartaSans(
                                               color: index == 0
                                                   ? MyColors.primary
                                                   : Colors.white,
-                                            )
-                                          : SizedBox(),
-                                      currentUser.language == 'en'
-                                          ? SizedBox(width: 3.w)
-                                          : SizedBox(),
-                                      Text(
-                                        titles[index].tr,
-                                        style: GoogleFonts.plusJakartaSans(
-                                          color: index == 0
-                                              ? MyColors.primary
-                                              : Colors.white,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          currentUser.language != 'en'
+                                              ? SizedBox(width: 3.w)
+                                              : SizedBox(),
+                                          currentUser.language != 'en'
+                                              ? Image.asset(
+                                                  images[index],
+                                                  height: 2.h,
+                                                  color: MyColors.primary,
+                                                )
+                                              : SizedBox(),
+                                        ],
                                       ),
-                                      currentUser.language != 'en'
-                                          ? SizedBox(width: 3.w)
-                                          : SizedBox(),
-                                      currentUser.language != 'en'
-                                          ? Image.asset(
-                                              images[index],
-                                              height: 2.h,
-                                              color: MyColors.primary,
-                                            )
-                                          : SizedBox(),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
                           ),
                         ),
                       ),

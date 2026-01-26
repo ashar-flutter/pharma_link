@@ -35,7 +35,10 @@ class _DetailPageState extends State<DetailPage> {
                   children: [
                     onPress(
                       ontap: () => Get.back(),
-                      child: Image.asset("assets/images/as24.png", height: 4.h),
+                      child: Image.asset(
+                        "assets/images/back.png",
+                        height: 3.5.h,
+                      ),
                     ),
                     Spacer(),
                     text_widget(
@@ -46,8 +49,8 @@ class _DetailPageState extends State<DetailPage> {
                     Spacer(),
                     // Transparent placeholder to keep title centered
                     Image.asset(
-                      "assets/images/as24.png",
-                      height: 4.h,
+                      "assets/images/back.png",
+                      height: 3.5.h,
                       color: Colors.transparent,
                     ),
                   ],
@@ -80,7 +83,7 @@ class _DetailPageState extends State<DetailPage> {
                           child: PageView.builder(
                             controller: _pageController,
                             itemCount: 4, // Number of images
-                            itemBuilder: (context, index) {
+                            itemBuilder: (BuildContext context, index) {
                               return ClipRRect(
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(30),
@@ -127,7 +130,7 @@ class _DetailPageState extends State<DetailPage> {
                                 children: [
                                   Text(
                                     "Pharmacy Name Here",
-                                    style: TextStyle(
+                                    style: GoogleFonts.plusJakartaSans(
                                       color: Color(0xff1E1E1E),
                                       fontSize: 17.sp,
                                       fontWeight: FontWeight.bold,
@@ -135,7 +138,7 @@ class _DetailPageState extends State<DetailPage> {
                                   ),
                                   Text(
                                     "46 Avenue de Lascrosse, 31000 - Toulouse",
-                                    style: TextStyle(
+                                    style: GoogleFonts.plusJakartaSans(
                                       color: Color.fromARGB(91, 30, 30, 30),
                                       fontSize: 13.sp,
                                       fontWeight: FontWeight.w400,
@@ -171,7 +174,7 @@ class _DetailPageState extends State<DetailPage> {
                           SizedBox(height: 1.h),
                           Text(
                             "Job Details",
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Color(0xff1E1E1E),
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,

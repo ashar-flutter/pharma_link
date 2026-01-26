@@ -107,8 +107,8 @@ class SearchPageState extends State<SearchPage> {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -119,8 +119,8 @@ class SearchPageState extends State<SearchPage> {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
+                        "assets/images/back.png",
+                        height: 3.5.h,
                         color: Colors.transparent,
                       ),
                     ],

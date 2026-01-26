@@ -1,18 +1,23 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/config/supportFunctions.dart';
 import 'package:linkpharma/controller/auth_controller.dart';
-import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
+import 'package:linkpharma/page/auth/select_role_page.dart';
+import 'package:linkpharma/services/auth_services.dart';
+import 'package:linkpharma/services/firestorage_services.dart';
+import 'package:linkpharma/services/loadingService.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
+import 'package:linkpharma/widgets/image_widget.dart';
 import 'package:linkpharma/widgets/ontap.dart';
+import 'package:linkpharma/widgets/showPopup.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
-import 'package:path/path.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PharmacyAdd extends StatelessWidget {
@@ -43,36 +48,11 @@ class PharmacyAdd extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              onPress(
-                                ontap: () {
-                                  if (con.selectIndex == 0) {
-                                    Get.back();
-                                    return;
-                                  }
-                                  con.selectIndex--;
-                                  con.update();
-                                },
-                                child: Image.asset(
-                                  "assets/images/as24.png",
-                                  height: 3.5.h,
-                                ),
-                              ),
-                              Spacer(),
-                              text_widget(
-                                isEdit ? "Edit Details" : "Pharmacy Details",
-                                color: Colors.white,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              Spacer(),
-                              Image.asset(
-                                "assets/images/as24.png",
-                                height: 3.5.h,
-                                color: Colors.transparent,
-                              ),
-                            ],
+                          text_widget(
+                            isEdit ? "Edit Details" : "Pharmacy Details",
+                            color: Colors.white,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
                           ),
                         ],
                       ),
@@ -102,6 +82,43 @@ class PharmacyAdd extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+              Positioned.fill(
+                left: 4.w,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: SafeArea(
+                    child: onPress(
+                      ontap: () {
+                        if (currentUser.id.isEmpty) {
+                          if (con.selectIndex == 0) {
+                            Get.back();
+                          } else {
+                            con.selectIndex--;
+                          }
+                          con.update();
+                        } else {
+                          showPopup(
+                            context,
+                            "Logout",
+                            "Are you sure you want to logout and leave the user profile?",
+                            "Cancel",
+                            "Logout",
+                            () => Get.back(),
+                            () async {
+                              await AuthServices.I.logOut();
+                              Get.offAll(SelectRolePage());
+                            },
+                          );
+                        }
+                      },
+                      child: Image.asset(
+                        "assets/images/back.png",
+                        height: 3.5.h,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           );
@@ -335,7 +352,7 @@ class PharmacyAdd extends StatelessWidget {
         text_widget(
           "Pharmacy description",
           color: Colors.black,
-          fontSize: 15.5.sp,
+          fontSize: 13.4.sp,
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 0.8.h),
@@ -352,7 +369,7 @@ class PharmacyAdd extends StatelessWidget {
             text_widget(
               "Services",
               color: Colors.black,
-              fontSize: 15.5.sp,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w500,
             ),
             Spacer(),
@@ -376,7 +393,7 @@ class PharmacyAdd extends StatelessWidget {
                         text_widget(
                           "Add Service",
                           color: Colors.black,
-                          fontSize: 15.5.sp,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w500,
                         ),
                         SizedBox(height: 2.h),
@@ -390,7 +407,9 @@ class PharmacyAdd extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 2.w),
-                            onPress(
+                            gradientButton(
+                              "Add",
+                              width: 3.w,
                               ontap: () {
                                 if (singleServiceController.text != "") {
                                   con.services.add(
@@ -401,21 +420,10 @@ class PharmacyAdd extends StatelessWidget {
                                   Get.back();
                                 }
                               },
-                              child: Container(
-                                height: 5.5.h,
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: MyColors.primary,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: text_widget(
-                                  "   Add   ",
-                                  color: Colors.white,
-                                  fontSize: 15.5.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              height: 5.5,
+                              isColor: true,
+                              font: 16,
+                              clr: MyColors.primary,
                             ),
                             SizedBox(width: 3.w),
                           ],
@@ -499,11 +507,9 @@ class PharmacyAdd extends StatelessWidget {
   Column page3(BuildContext context, AuthController con) {
     TextEditingController nameController = TextEditingController();
     TextEditingController sureNameController = TextEditingController();
-    File? file;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 2.h),
         text_widget(
           "Add New Owner",
           color: Colors.black,
@@ -511,7 +517,29 @@ class PharmacyAdd extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 2.h),
-        Center(child: Image.asset("assets/icons/pp.png", height: 13.h)),
+        Container(
+          height: 15.h,
+          decoration: BoxDecoration(shape: BoxShape.circle),
+          child: onPress(
+            ontap: () async {
+              con.profileImage = await SupportFunctions.I.getImage(
+                context: context,
+                isCircleCrop: true,
+              );
+              con.update();
+            },
+            child: Center(
+              child: con.profileImage != null
+                  ? imageWidget(
+                      image: con.profileImage!.path,
+                      borderRadius: 100,
+                      width: 15.h,
+                      height: 15.h,
+                    )
+                  : Image.asset("assets/icons/pp.png", fit: BoxFit.fill),
+            ),
+          ),
+        ),
         SizedBox(height: 2.h),
         text_widget(
           "Name",
@@ -525,7 +553,6 @@ class PharmacyAdd extends StatelessWidget {
           controller: nameController,
         ),
         SizedBox(height: 2.h),
-
         text_widget(
           "Surname",
           color: Colors.black,
@@ -537,92 +564,96 @@ class PharmacyAdd extends StatelessWidget {
           "Write here".tr,
           controller: sureNameController,
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
         gradientButton(
           "Add Owner",
           width: Get.width,
-          ontap: () async {},
+          ontap: () async {
+            if (con.profileImage == null) {
+              EasyLoading.showInfo("Please select an image");
+              return;
+            }
+            if (nameController.text.isEmpty ||
+                sureNameController.text.isEmpty) {
+              EasyLoading.showInfo("Please fill all fields");
+              return;
+            }
+            LoadingService.I.show(context);
+            String url = await FirestorageServices.I.uploadImage(
+              con.profileImage!,
+              "owners",
+            );
+            con.owners.add({
+              "name": nameController.text,
+              "sureName": sureNameController.text,
+              "image": url,
+            });
+            LoadingService.I.dismiss();
+            nameController.clear();
+            sureNameController.clear();
+            con.profileImage = null;
+            con.update();
+          },
           height: 5.5,
           isColor: false,
           font: 16,
           txtColor: MyColors.primary,
           clr: MyColors.white,
         ),
-        SizedBox(height: 2.h),
+        SizedBox(height: 1.h),
         Divider(thickness: 0.3),
-        SizedBox(height: 2.h),
-        text_widget("Owners Details", fontSize: 18.sp),
-        SizedBox(height: 2.h),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Container(
-                height: 15.h,
-                width: 45.w,
-                decoration: BoxDecoration(
-                  color: Color(0xffF6F6F6),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Spacer(),
-                        Image.asset("assets/icons/del.png", height: 2.5.h),
-                        SizedBox(width: 2.w),
-                      ],
-                    ),
-                    Image.asset("assets/images/as1.png", height: 6.h),
-                    SizedBox(height: 5),
-                    Text(
-                      "Dr. Philippe Martin",
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Color(0xff1E1E1E),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+        SizedBox(height: 1.h),
+        text_widget("Owners Details", fontSize: 15.sp),
+        SizedBox(height: 1.h),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.3,
+          ),
+          itemCount: con.owners.length,
+          itemBuilder: (context, index) {
+            final owner = con.owners[index];
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xffF6F6F6),
+                borderRadius: BorderRadius.circular(14),
               ),
-            ),
-            SizedBox(width: 2.w),
-            Expanded(
-              child: Container(
-                height: 15.h,
-                width: 45.w,
-                decoration: BoxDecoration(
-                  color: Color(0xffF6F6F6),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Spacer(),
-                        Image.asset("assets/icons/del.png", height: 2.5.h),
-                        SizedBox(width: 2.w),
-                      ],
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        con.owners.removeAt(index);
+                        con.update();
+                      },
+                      child: Image.asset("assets/icons/del.png", height: 18),
                     ),
-                    Image.asset("assets/images/as1.png", height: 6.h),
-                    SizedBox(height: 5),
-                    Text(
-                      "Dr. Philippe Martin",
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Color(0xff1E1E1E),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  Spacer(),
+                  Image.network(owner['image'], height: 70, fit: BoxFit.cover),
+                  Spacer(),
+                  Text(
+                    '${owner['name']} ${owner['sureName']}',
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: const Color(0xff1E1E1E),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                  Spacer(),
+                ],
               ),
-            ),
-          ],
+            );
+          },
         ),
         SizedBox(height: 4.h),
         gradientButton(
@@ -714,7 +745,7 @@ class WokringState extends State<Wokring> {
       initialTime: isStartTime
           ? workingTimeModel.days[dayIndex]["start"]
           : workingTimeModel.days[dayIndex]["end"],
-      builder: (context, child) {
+      builder: (BuildContext context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
@@ -760,7 +791,7 @@ class WokringState extends State<Wokring> {
         text_widget(
           "Opening Days & Hours",
           color: Colors.black,
-          fontSize: 13.4.sp,
+          fontSize: 15.sp,
           fontWeight: FontWeight.w500,
         ),
         SizedBox(height: 1.5.h),
@@ -853,7 +884,10 @@ class WokringState extends State<Wokring> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 1.w),
-                  child: Text("-", style: TextStyle(color: Colors.black)),
+                  child: Text(
+                    "-",
+                    style: GoogleFonts.plusJakartaSans(color: Colors.black),
+                  ),
                 ),
                 onPress(
                   ontap: () => _selectTime(context, index, false),

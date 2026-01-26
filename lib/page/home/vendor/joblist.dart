@@ -174,7 +174,7 @@ class _VendorJobListsState extends State<VendorJobLists> {
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: filteredJobs.length,
-                            itemBuilder: (context, index) {
+                            itemBuilder: (BuildContext context, index) {
                               return JobCard(job: filteredJobs[index]);
                             },
                           ),
@@ -196,7 +196,7 @@ class _VendorJobListsState extends State<VendorJobLists> {
                                 },
                                 child: Text(
                                   "Add New Job",
-                                  style: TextStyle(
+                                  style: GoogleFonts.plusJakartaSans(
                                     fontSize: 16,
                                     color: Colors.white,
                                   ),

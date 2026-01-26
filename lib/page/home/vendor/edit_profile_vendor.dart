@@ -24,7 +24,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
+      builder: (BuildContext context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
@@ -71,7 +71,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                             Get.back();
                           },
                           child: Image.asset(
-                            "assets/images/as24.png",
+                            "assets/images/back.png",
                             height: 4.h,
                           ),
                         ),
@@ -83,7 +83,7 @@ class EditProfileVendorState extends State<EditProfileVendor> {
                         ),
                         Spacer(),
                         Image.asset(
-                          "assets/images/as24.png",
+                          "assets/images/back.png",
                           height: 3.5.h,
                           color: Colors.transparent,
                         ),

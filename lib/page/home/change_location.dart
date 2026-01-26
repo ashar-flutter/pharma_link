@@ -70,8 +70,8 @@ class _ChangeLocationState extends State<ChangeLocation> {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -83,7 +83,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
+                        "assets/images/back.png",
                         height: 3.5.h,
                         color: Colors.transparent,
                       ),

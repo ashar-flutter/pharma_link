@@ -8,7 +8,9 @@ import 'package:get/get.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/firebase_options.dart';
 import 'package:linkpharma/page/auth/boardin_page.dart';
+import 'package:linkpharma/page/auth/signup_user_page.dart';
 import 'package:linkpharma/page/home/user_drawer.dart';
+import 'package:linkpharma/page/home/vendor/pharmacy_add.dart';
 import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/services/auth_services.dart';
 import 'package:path/path.dart';
@@ -31,9 +33,17 @@ class _SplashScreenState extends State<SplashScreen> {
       if (currentUser.id == "") {
         Get.offAll(() => const BoardingPage());
       } else if (currentUser.userType == 1) {
-        Get.offAll(() => const UserDrawer());
+        if (currentUser.firstName.isEmpty) {
+          Get.offAll(() => const SignupUserPage());
+        } else {
+          Get.offAll(() => const UserDrawer());
+        }
       } else {
-        Get.offAll(() => const VendorDrawer());
+        if (currentUser.firstName.isEmpty) {
+          Get.offAll(() => PharmacyAdd(isEdit: false));
+        } else {
+          Get.offAll(() => const VendorDrawer());
+        }
       }
     });
   }
@@ -59,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
       children: [
         Positioned.fill(
           child: Image.asset(
-            'assets/images/splahs.png',
+            'assets/images/splash.png',
             height: 100.h,
             width: 100.w,
             fit: BoxFit.cover,

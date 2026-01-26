@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/home/change_location.dart';
@@ -71,7 +72,7 @@ class ProfilePage1 extends StatelessWidget {
                           children: [
                             Text(
                               "Daniel Russel",
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 color: Color(0xffFFFFFF),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -79,7 +80,7 @@ class ProfilePage1 extends StatelessWidget {
                             ),
                             Text(
                               "abc1231234@gmai.com",
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 color: Color(0xffFFFFFF),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w300,
@@ -121,7 +122,7 @@ class ProfilePage1 extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             "Change Password",
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Color(0xff1E1E1E),
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -150,7 +151,7 @@ class ProfilePage1 extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             "Change Location",
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Color(0xff1E1E1E),
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -179,7 +180,7 @@ class ProfilePage1 extends StatelessWidget {
                           SizedBox(width: 3.w),
                           Text(
                             "Delete Account",
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Color(0xff1E1E1E),
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -205,7 +206,7 @@ class ProfilePage1 extends StatelessWidget {
                       },
                       child: Text(
                         "Logout",
-                        style: TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 16,
                           color: Color(0xffFFFFFF),
                         ),

@@ -37,8 +37,8 @@ class VendorJobsDetailPage extends StatelessWidget {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -49,8 +49,8 @@ class VendorJobsDetailPage extends StatelessWidget {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
+                        "assets/images/back.png",
+                        height: 3.5.h,
                         color: Colors.transparent,
                       ),
                     ],
@@ -244,7 +244,7 @@ class VendorJobsDetailPage extends StatelessWidget {
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Write text here",
-                                  hintStyle: TextStyle(
+                                  hintStyle: GoogleFonts.plusJakartaSans(
                                     color: Colors.grey,
                                     fontSize: 14.sp,
                                   ),

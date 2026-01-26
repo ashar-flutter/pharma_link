@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(
-      builder: (context, orientation, screenType) {
+      builder: (BuildContext context, orientation, screenType) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           defaultTransition: Transition.fadeIn,

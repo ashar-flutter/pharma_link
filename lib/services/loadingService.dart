@@ -36,7 +36,7 @@ class _DashedCircularLoader extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 5),
       duration: const Duration(milliseconds: 3500),
-      builder: (context, value, child) {
+      builder: (BuildContext context, value, child) {
         return Transform.rotate(
           angle: value * 6.28,
           child: CustomPaint(

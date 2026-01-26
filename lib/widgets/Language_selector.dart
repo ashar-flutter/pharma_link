@@ -8,9 +8,9 @@ import 'package:remixicon/remixicon.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class LanguageDropdown extends StatefulWidget {
-  final Color bColors;
+  final Color backgroundColor;
 
-  const LanguageDropdown({super.key, required this.bColors});
+  const LanguageDropdown({super.key, required this.backgroundColor});
   @override
   LanguageDropdownState createState() => LanguageDropdownState();
 }
@@ -46,15 +46,15 @@ class LanguageDropdownState extends State<LanguageDropdown> {
       init: LanguageController(),
       builder: (LanguageController con) {
         return Theme(
-          data: ThemeData(canvasColor: Colors.white),
+          data: ThemeData(canvasColor: widget.backgroundColor),
           child: Container(
             height: 3.5.h,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: widget.backgroundColor,
               borderRadius: BorderRadius.circular(40),
             ),
             child: StatefulBuilder(
-              builder: (context, setDropdownState) {
+              builder: (BuildContext context, setDropdownState) {
                 return DropdownButtonHideUnderline(
                   child: DropdownButton2<Map<String, String>>(
                     value: selectedLanguage,
@@ -102,6 +102,8 @@ class LanguageDropdownState extends State<LanguageDropdown> {
                           value: lang,
                           alignment: AlignmentDirectional.centerStart,
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               CircleAvatar(
                                 backgroundColor: Colors.transparent,
@@ -113,7 +115,6 @@ class LanguageDropdownState extends State<LanguageDropdown> {
                                 lang["name"]!,
                                 color: Colors.black,
                                 fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
                               ),
                             ],
                           ),

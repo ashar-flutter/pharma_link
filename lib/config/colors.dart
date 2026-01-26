@@ -127,121 +127,128 @@ void showAnimatedDeleteAccountDialog(BuildContext context) {
     barrierLabel: "DeleteAccount",
     barrierColor: Colors.black.withOpacity(0.4),
     transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (context, animation, secondaryAnimation) {
+    pageBuilder: (BuildContext context, animation, secondaryAnimation) {
       return const SizedBox();
     },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      final curvedValue = Curves.easeInOut.transform(animation.value) - 1.0;
+    transitionBuilder:
+        (BuildContext context, animation, secondaryAnimation, child) {
+          final curvedValue = Curves.easeInOut.transform(animation.value) - 1.0;
 
-      return Transform.scale(
-        scale: animation.value,
-        child: Opacity(
-          opacity: animation.value,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  /// Animated Icon
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xff10B66D).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.delete_forever_rounded,
-                      color: Color(0xff10B66D),
-                      size: 34,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  /// Title
-                  Text(
-                    "Delete Account?",
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  /// Description
-                  Text(
-                    "This action cannot be undone. All your data will be permanently removed.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  /// Buttons
-                  Row(
+          return Transform.scale(
+            scale: animation.value,
+            child: Opacity(
+              opacity: animation.value,
+              child: Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xff10B66D)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: GoogleFonts.plusJakartaSans(
-                              color: const Color(0xff10B66D),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                      /// Animated Icon
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff10B66D).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.delete_forever_rounded,
+                          color: Color(0xff10B66D),
+                          size: 34,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            // 👉 delete account logic here
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff10B66D),
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            "Delete",
-                            style: GoogleFonts.plusJakartaSans(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+
+                      const SizedBox(height: 14),
+
+                      /// Title
+                      Text(
+                        "Delete Account?",
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      /// Description
+                      Text(
+                        "This action cannot be undone. All your data will be permanently removed.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      /// Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: Color(0xff10B66D),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: Text(
+                                "Cancel",
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: const Color(0xff10B66D),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                // 👉 delete account logic here
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff10B66D),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: Text(
+                                "Delete",
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      );
-    },
+          );
+        },
   );
 }

@@ -148,14 +148,17 @@ class AuthController extends GetxController {
     currentUser.rpps = rppsController.text;
     currentUser.description = descriptionController.text;
     currentUser.cv = await FirestorageServices.I.uploadFile(cv!, "cvs");
-    String error = await AuthServices.I.emailSignUp(
-      context,
-      emailController.text,
-      passwordController.text,
-    );
-    if (error.isNotEmpty) {
-      EasyLoading.showError(error);
-      return;
+
+    if (currentUser.id.isEmpty) {
+      String error = await AuthServices.I.emailSignUp(
+        context,
+        emailController.text,
+        passwordController.text,
+      );
+      if (error.isNotEmpty) {
+        EasyLoading.showError(error);
+        return;
+      }
     }
     await FirestoreServices.I.addUser(currentUser);
     LoadingService.I.dismiss();
@@ -229,14 +232,13 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please add at least one service");
       return;
     }
-    // selectIndex = 2;
-    // update();
-    // scrollController.animateTo(
-    //   0,
-    //   duration: Duration(milliseconds: 300),
-    //   curve: Curves.easeOut,
-    // );
-    signUpVendorEmail(context);
+    selectIndex = 2;
+    update();
+    scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   void page3(BuildContext context) {
@@ -244,10 +246,10 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please add at least one image");
       return;
     }
-    signUpVendorEmail(context);
+    _signUpVendorEmail(context);
   }
 
-  Future<void> signUpVendorEmail(BuildContext context) async {
+  Future<void> _signUpVendorEmail(BuildContext context) async {
     LoadingService.I.show(context);
     currentUser.firstName = firstNameController.text;
     currentUser.address = addressController.text;
@@ -270,14 +272,16 @@ class AuthController extends GetxController {
     currentUser.description = descriptionController.text;
     currentUser.services = services;
     currentUser.owners = owners;
-    String error = await AuthServices.I.emailSignUp(
-      context,
-      emailController.text,
-      passwordController.text,
-    );
-    if (error.isNotEmpty) {
-      EasyLoading.showError(error);
-      return;
+    if (currentUser.id.isEmpty) {
+      String error = await AuthServices.I.emailSignUp(
+        context,
+        emailController.text,
+        passwordController.text,
+      );
+      if (error.isNotEmpty) {
+        EasyLoading.showError(error);
+        return;
+      }
     }
     await FirestoreServices.I.addUser(currentUser);
     LoadingService.I.dismiss();

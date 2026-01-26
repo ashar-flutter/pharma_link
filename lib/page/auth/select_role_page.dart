@@ -42,15 +42,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 2.h),
-                    Row(
-                      children: [
-                        Spacer(),
-                        LanguageDropdown(bColors: Colors.white),
-                        SizedBox(width: 4.w),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 3.h),
                     Text(
                       "Select Role",
                       style: GoogleFonts.plusJakartaSans(
@@ -68,7 +60,7 @@ class _SelectRolePageState extends State<SelectRolePage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 3.h),
                     Image.asset("assets/images/logo.png", height: 12.h),
                     SizedBox(height: 3.h),
                     Column(
@@ -112,6 +104,16 @@ class _SelectRolePageState extends State<SelectRolePage> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            right: 4.w,
+            top: .5.h,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: SafeArea(
+                child: LanguageDropdown(backgroundColor: Colors.white38),
               ),
             ),
           ),

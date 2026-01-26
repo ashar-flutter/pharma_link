@@ -61,8 +61,7 @@ Widget gradientButton(
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: "SFProDisplay",
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: font == 0 ? 17.sp : font.sp,
                     fontWeight: weight ?? FontWeight.w600,
                     color: txtColor,
@@ -75,7 +74,7 @@ Widget gradientButton(
               child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: font == 0 ? 17.sp : font.sp,
                   fontWeight: FontWeight.w600,
                   color: txtColor,

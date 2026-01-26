@@ -80,8 +80,8 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                           Get.back();
                         },
                         child: Image.asset(
-                          "assets/images/as24.png",
-                          height: 4.h,
+                          "assets/images/back.png",
+                          height: 3.5.h,
                         ),
                       ),
                       Spacer(),
@@ -92,8 +92,8 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                       ),
                       Spacer(),
                       Image.asset(
-                        "assets/images/as24.png",
-                        height: 4.h,
+                        "assets/images/back.png",
+                        height: 3.5.h,
                         color: Colors.transparent,
                       ),
                     ],
@@ -117,7 +117,7 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                 padding: EdgeInsets.all(0),
                 itemCount: jobList.length,
                 separatorBuilder: (_, __) => SizedBox(height: 2.h),
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, index) {
                   final job = jobList[index];
 
                   return onPress(
@@ -148,7 +148,7 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                               children: [
                                 Text(
                                   job.pharmacyName,
-                                  style: TextStyle(
+                                  style: GoogleFonts.plusJakartaSans(
                                     color: Color(0xff10B66D),
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w500,
@@ -156,7 +156,7 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                                 ),
                                 Text(
                                   job.dateTime,
-                                  style: TextStyle(
+                                  style: GoogleFonts.plusJakartaSans(
                                     color: Color.fromARGB(93, 30, 30, 30),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
@@ -165,7 +165,7 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                                 SizedBox(height: 2.h),
                                 Text(
                                   job.position,
-                                  style: TextStyle(
+                                  style: GoogleFonts.plusJakartaSans(
                                     color: Color(0xff1E1E1E),
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,

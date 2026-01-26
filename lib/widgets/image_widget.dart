@@ -22,8 +22,9 @@ Widget imageWidget({
           fit: fit,
           width: width != null ? width - (borderWidth * 2) : 100.w,
           height: height != null ? height - (borderWidth * 2) : 100.w,
-          placeholder: (context, url) => const _ShimmerPlaceholder(),
-          errorWidget: (context, url, error) =>
+          placeholder: (BuildContext context, url) =>
+              const _ShimmerPlaceholder(),
+          errorWidget: (BuildContext context, url, error) =>
               _buildErrorWidget(width, height, url: image),
           fadeInDuration: const Duration(milliseconds: 300),
         )
@@ -32,7 +33,7 @@ Widget imageWidget({
           fit: fit,
           width: width != null ? width - (borderWidth * 2) : 100.w,
           height: height != null ? height - (borderWidth * 2) : null,
-          errorBuilder: (context, error, stackTrace) =>
+          errorBuilder: (BuildContext context, error, stackTrace) =>
               _buildErrorWidget(width, height),
         );
 

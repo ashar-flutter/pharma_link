@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
@@ -36,7 +37,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
           ),
           automaticallyImplyLeading: false,
           leading: IconButton(
-            icon: Image.asset("assets/images/as24.png", height: 4.h),
+            icon: Image.asset("assets/images/back.png", height: 3.5.h),
             onPressed: () => Get.back(),
           ),
           title: Row(
@@ -172,7 +173,7 @@ class ChatScreen extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
       itemCount: messages.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (BuildContext context, index) {
         final message = messages[index];
         final isBot = message['sender'] == 'bot';
         return Align(
@@ -207,7 +208,7 @@ class ChatScreen extends StatelessWidget {
                         ),
                         child: Text(
                           message['text']!.tr,
-                          style: TextStyle(
+                          style: GoogleFonts.plusJakartaSans(
                             color: isBot ? Colors.black : Colors.white,
                           ),
                         ),

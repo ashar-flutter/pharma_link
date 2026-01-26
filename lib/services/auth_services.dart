@@ -9,10 +9,10 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:linkpharma/config/global.dart';
+import 'package:linkpharma/config/supportFunctions.dart';
 import 'package:linkpharma/models/user_model.dart';
 import 'package:linkpharma/page/auth/login_page.dart';
 import 'package:linkpharma/services/firestore_services.dart';
-import 'package:linkpharma/services/loadingService.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthServices {
@@ -20,7 +20,11 @@ class AuthServices {
   static final AuthServices I = AuthServices._();
   AuthServices._();
 
-  Future<String> emailSignIn(context, String email, String password) async {
+  Future<String> emailSignIn(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     try {
       UserCredential fbUser = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -33,11 +37,15 @@ class AuthServices {
       return "error";
     } on FirebaseAuthException catch (error) {
       logger.e(error);
-      return error.message ?? error.code;
+      return SupportFunctions.I.getFirebaseErrorMessage(error.code);
     }
   }
 
-  Future<String> emailSignUp(context, String email, password) async {
+  Future<String> emailSignUp(
+    BuildContext context,
+    String email,
+    password,
+  ) async {
     try {
       UserCredential fbUser = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -50,7 +58,8 @@ class AuthServices {
       }
       return "Failed to Sign Up";
     } on FirebaseAuthException catch (error) {
-      return error.message ?? error.code;
+      logger.e(error);
+      return SupportFunctions.I.getFirebaseErrorMessage(error.code);
     }
   }
 
@@ -58,15 +67,20 @@ class AuthServices {
     try {
       await FirebaseAuth.instance.currentUser!.sendEmailVerification();
       return "";
-    } on FirebaseAuthException catch (e) {
-      return e.code;
+    } on FirebaseAuthException catch (error) {
+      logger.e(error);
+      return SupportFunctions.I.getFirebaseErrorMessage(error.code);
     }
   }
 
   static bool emailVarification() {
     try {
       return FirebaseAuth.instance.currentUser!.emailVerified;
-    } catch (e) {
+    } on FirebaseAuthException catch (error) {
+      logger.e(error);
+      EasyLoading.showError(
+        SupportFunctions.I.getFirebaseErrorMessage(error.code),
+      );
       return false;
     }
   }
@@ -76,7 +90,10 @@ class AuthServices {
       await _auth.sendPasswordResetEmail(email: mail);
       EasyLoading.showSuccess("Password reset email sent");
     } on FirebaseAuthException catch (error) {
-      EasyLoading.showError(error.message ?? error.code);
+      logger.e(error);
+      EasyLoading.showError(
+        SupportFunctions.I.getFirebaseErrorMessage(error.code),
+      );
     }
   }
 
@@ -101,7 +118,7 @@ class AuthServices {
       return "";
     } on FirebaseAuthException catch (error) {
       logger.e(error);
-      return error.message ?? error.code;
+      return SupportFunctions.I.getFirebaseErrorMessage(error.code);
     }
   }
 
@@ -109,6 +126,7 @@ class AuthServices {
     User? fbUser = FirebaseAuth.instance.currentUser;
     if (fbUser != null) {
       currentUser = await FirestoreServices.I.getUser(fbUser.uid);
+      currentUser.id = fbUser.uid;
       if (currentUser.enable == false) {
         await logOut();
         EasyLoading.showInfo("Your account is blocked contact to the support.");

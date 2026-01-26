@@ -43,7 +43,7 @@ class _PharmaceyDetailState extends State<PharmaceyDetail> {
                     child: PageView.builder(
                       controller: _pageController,
                       itemCount: 4,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (BuildContext context, index) {
                         return ClipRRect(
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(30),
@@ -89,7 +89,7 @@ class _PharmaceyDetailState extends State<PharmaceyDetail> {
                             Get.back();
                           },
                           child: Image.asset(
-                            "assets/images/as24.png",
+                            "assets/images/back.png",
                             height: 4.h,
                           ),
                         ),
