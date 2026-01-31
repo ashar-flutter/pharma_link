@@ -38,50 +38,50 @@ class SupportFunctions {
 
     final List<SpecialItem<AssetPathEntity>> specialItems = showCamera
         ? [
-            SpecialItem(
-              position: SpecialItemPosition.prepend,
-              builder:
-                  (
-                    BuildContext context,
-                    AssetPathEntity? path,
-                    PermissionState ps,
-                  ) {
-                    return GestureDetector(
-                      onTap: () async {
-                        final AssetEntity? entity =
-                            await CameraPicker.pickFromCamera(
-                              context,
-                              pickerConfig: CameraPickerConfig(
-                                enableRecording: false,
-                                theme: ThemeData(
-                                  colorScheme: ColorScheme.dark(
-                                    secondary: MyColors.primary,
-                                  ),
-                                ),
-                              ),
-                              locale: Locale('en', 'US'),
-                            );
-                        if (entity != null && context.mounted) {
-                          Navigator.of(context).pop([entity]);
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.primary,
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 48,
-                            color: MyColors.primary1,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+      SpecialItem(
+        position: SpecialItemPosition.prepend,
+        builder:
+            (
+            BuildContext context,
+            AssetPathEntity? path,
+            PermissionState ps,
+            ) {
+          return GestureDetector(
+            onTap: () async {
+              final AssetEntity? entity =
+              await CameraPicker.pickFromCamera(
+                context,
+                pickerConfig: CameraPickerConfig(
+                  enableRecording: false,
+                  theme: ThemeData(
+                    colorScheme: ColorScheme.dark(
+                      secondary: MyColors.primary,
+                    ),
+                  ),
+                ),
+                locale: Locale('en', 'US'),
+              );
+              if (entity != null && context.mounted) {
+                Navigator.of(context).pop([entity]);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: MyColors.primary,
+                borderRadius: BorderRadius.circular(0),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.camera_alt,
+                  size: 48,
+                  color: MyColors.primary1,
+                ),
+              ),
             ),
-          ]
+          );
+        },
+      ),
+    ]
         : [];
 
     final List<AssetEntity>? result = await AssetPicker.pickAssets(
@@ -144,12 +144,10 @@ class SupportFunctions {
         allowedAspectRatios: isCircleCrop
             ? []
             : [
-                CropAspectRatio(height: 1, width: 3),
-                CropAspectRatio(height: 1, width: 2),
-                CropAspectRatio(height: 1, width: 1),
-              ],
-
-        cropPathFn: isCircleCrop ? circleCropShapeFn : aabbCropShapeFn,
+          CropAspectRatio(height: 1, width: 3),
+          CropAspectRatio(height: 1, width: 2),
+          CropAspectRatio(height: 1, width: 1),
+        ],
         showLoadingIndicatorOnSubmit: true,
       );
       if (result != null) {
@@ -191,7 +189,6 @@ class SupportFunctions {
       ),
       heroTag: 'image',
       allowedAspectRatios: [CropAspectRatio(height: 1, width: 1)],
-      cropPathFn: isCircleCrop ? circleCropShapeFn : aabbCropShapeFn,
       showLoadingIndicatorOnSubmit: true,
     );
     if (result != null) {
@@ -231,7 +228,6 @@ class SupportFunctions {
         ),
         heroTag: 'image',
         allowedAspectRatios: [CropAspectRatio(height: 1, width: 2)],
-        cropPathFn: isCircleCrop ? circleCropShapeFn : aabbCropShapeFn,
         showLoadingIndicatorOnSubmit: true,
       );
       if (result != null) {
@@ -263,7 +259,6 @@ class SupportFunctions {
     }
 
     switch (error.code) {
-      // 🔐 AUTH
       case 'invalid-email':
         return 'Email is not valid';
       case 'email-already-in-use':
@@ -290,8 +285,6 @@ class SupportFunctions {
         return 'Too many attempts. Try again later';
       case 'operation-not-allowed':
         return 'This sign-in method is disabled';
-
-      // 🔥 FIRESTORE
       case 'permission-denied':
         return 'You do not have permission to perform this action';
       case 'not-found':
@@ -312,8 +305,6 @@ class SupportFunctions {
         return 'Service temporarily unavailable';
       case 'unauthenticated':
         return 'Please sign in to continue';
-
-      // 📦 STORAGE
       case 'object-not-found':
         return 'File not found';
       case 'bucket-not-found':
@@ -330,13 +321,10 @@ class SupportFunctions {
         return 'Upload failed. Please try again';
       case 'canceled':
         return 'Operation cancelled';
-
-      // 🌐 COMMON
       case 'network-request-failed':
         return 'Network error. Check your connection';
       case 'internal-error':
         return 'Internal error. Please try again';
-
       default:
         return 'Something went wrong. Please try again';
     }

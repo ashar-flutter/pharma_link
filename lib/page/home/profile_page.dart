@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/home/change_location.dart';
 import 'package:linkpharma/page/home/change_password.dart';
@@ -9,7 +11,6 @@ import 'package:linkpharma/page/home/user_editProfile.dart';
 import 'package:linkpharma/page/home/vendor/edit_profile_vendor.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
-
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ProfilePage1 extends StatelessWidget {
@@ -64,14 +65,52 @@ class ProfilePage1 extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.asset("assets/images/as6.png", height: 6.h),
+                        currentUser.image.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: CachedNetworkImage(
+                                  imageUrl: currentUser.image,
+                                  height: 6.h,
+                                  width: 6.h,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 3.h,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Color(0xff10B66D),
+                                      size: 2.5.h,
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        radius: 3.h,
+                                        child: Icon(
+                                          Icons.person,
+                                          color: Color(0xff10B66D),
+                                          size: 2.5.h,
+                                        ),
+                                      ),
+                                ),
+                              )
+                            : CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 3.h,
+                                child: Icon(
+                                  Icons.person,
+                                  color: Color(0xff10B66D),
+                                  size: 2.5.h,
+                                ),
+                              ),
                         SizedBox(width: 4.w),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Daniel Russel",
+                              "${currentUser.firstName} ${currentUser.lastName}"
+                                  .trim(),
                               style: GoogleFonts.plusJakartaSans(
                                 color: Color(0xffFFFFFF),
                                 fontSize: 14,
@@ -79,7 +118,9 @@ class ProfilePage1 extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "abc1231234@gmai.com",
+                              currentUser.email.isNotEmpty
+                                  ? currentUser.email
+                                  : "No email provided",
                               style: GoogleFonts.plusJakartaSans(
                                 color: Color(0xffFFFFFF),
                                 fontSize: 13,
@@ -91,9 +132,9 @@ class ProfilePage1 extends StatelessWidget {
                         Spacer(),
                         onPress(
                           ontap: () {
-                            // userType != 1
-                            //     ? Get.to(EditProfileVendor())
-                            //     : Get.to(UserEditprofile());
+                            currentUser.userType != 1
+                                ? Get.to(EditProfileVendor())
+                                : Get.to(UserEditprofile());
                           },
                           child: Image.asset(
                             "assets/images/as44.png",

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/home/chat/chat_page.dart';
-import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';

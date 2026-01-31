@@ -73,245 +73,266 @@ class PrivacyPage extends StatelessWidget {
                   horizontal: 25,
                   vertical: 25,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy text ever since the 1500s, when an unknown \nprinter took a galley of type and scrambled it to make a type \nspecimen book. It has survived not only five centuries",
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Color(0xff0F0F0F),
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "At LinkPharma, we are committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.",
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Color(0xff0F0F0F),
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      textAlign: TextAlign.start,
-                    ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      "Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy text ever since the 1500s, when an unknown \nprinter took a galley of type and scrambled it to make a type \nspecimen book. It has survived not only five centuries",
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Color(0xff0F0F0F),
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
+                      SizedBox(height: 3.h),
+                      Text(
+                        "Please read this privacy policy carefully. If you do not agree with the terms, please do not access the application. We reserve the right to make changes to this Privacy Policy at any time and for any reason.",
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Color(0xff0F0F0F),
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      textAlign: TextAlign.start,
-                    ),
-                    SizedBox(height: 3.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "1.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                      SizedBox(height: 3.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "1.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and typesetting \nindustry.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(107, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Information We Collect: We collect personal information you voluntarily provide when registering, applying for jobs, or contacting us. This may include name, email, phone number, qualifications, and work experience.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(107, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "2.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "2.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and typesetting \nindustry.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(99, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "How We Use Your Information: To provide and maintain our service, notify you about job opportunities, process your applications, improve our app, and communicate important updates.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(99, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "3.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "3.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy text ever since",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(111, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Data Sharing: We do not sell your personal data. We may share information with potential employers only when you apply for jobs, and with service providers who assist our operations under strict confidentiality agreements.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(111, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "4.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "4.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          "Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(103, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Data Security: We implement security measures to protect your personal information. However, no electronic transmission is 100% secure, and we cannot guarantee absolute security.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(103, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "5.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "5.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and typesetting \nindustry.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(111, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Your Rights: You may access, correct, or delete your personal information. You can opt-out of marketing communications and request data portability as per applicable laws.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(111, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "6.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "6.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and typesetting \nindustry.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(113, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Cookies and Tracking: We use cookies to enhance user experience, analyze app usage, and improve our services. You can control cookie preferences through your device settings.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(113, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "7.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "7.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          "Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy text ever since",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(104, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Third-Party Links: Our app may contain links to third-party websites or services. We are not responsible for their privacy practices and encourage you to review their policies.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(104, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "8.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "8.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          "Lorem Ipsum is simply dummy text of the printing and \ntypesetting industry. Lorem Ipsum has been the industry's \nstandard dummy.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(103, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Children's Privacy: Our services are not intended for users under 18. We do not knowingly collect information from children. If we discover such data, we will delete it immediately.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(103, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "9.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color(0xff10B66D),
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "9.",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff10B66D),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          " Lorem Ipsum is simply dummy text of the printing and typesetting \nindustry.",
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Color.fromARGB(100, 30, 30, 30),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Text(
+                              "Contact Us: For privacy-related questions, contact our Data Protection Officer at privacy@linkpharma.com or write to us at LinkPharma Headquarters, Digital Street, Tech City.",
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color.fromARGB(100, 30, 30, 30),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
                           ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                    ],
+                  ),
                 ),
               ),
             ),

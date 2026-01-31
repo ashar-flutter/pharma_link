@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
@@ -7,6 +6,7 @@ import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../../controller/job_controller.dart';
 
 class AddNewJob extends StatefulWidget {
   const AddNewJob({super.key});
@@ -17,6 +17,7 @@ class AddNewJob extends StatefulWidget {
 
 class AddNewJobState extends State<AddNewJob> {
   String? selectedCountry;
+  JobController jobController = Get.find<JobController>();
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -42,7 +43,9 @@ class AddNewJobState extends State<AddNewJob> {
     );
 
     if (pickedDate != null) {
-      debugPrint("Selected Date: $pickedDate");
+      jobController.selectedDate = pickedDate;
+      jobController.update();
+      setState(() {});
     }
   }
 
@@ -51,9 +54,7 @@ class AddNewJobState extends State<AddNewJob> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.primary,
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
       body: Column(
         children: [
           SafeArea(
@@ -93,141 +94,158 @@ class AddNewJobState extends State<AddNewJob> {
           ),
           SizedBox(height: 2.h),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 2.h),
-
-                      text_widget(
-                        "Job Title",
-                        color: Colors.black,
-                        fontSize: 13.4.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
-                      SizedBox(height: 2.h),
-                      Row(
+            child: GetBuilder<JobController>(
+              builder: (controller) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(height: 2.h),
+
                           text_widget(
-                            "Contract Type ",
+                            "Job Title",
                             color: Colors.black,
                             fontSize: 13.4.sp,
                             fontWeight: FontWeight.w500,
                           ),
+                          SizedBox(height: 0.8.h),
+                          textFieldWithPrefixSuffuxIconAndHintText(
+                            "Write here".tr,
+                            controller: jobController.titleController,
+                          ),
+                          SizedBox(height: 2.h),
+                          Row(
+                            children: [
+                              text_widget(
+                                "Contract Type ",
+                                color: Colors.black,
+                                fontSize: 13.4.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              text_widget(
+                                "*",
+                                color: Colors.red,
+                                fontSize: 13.4.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 0.8.h),
+                          customDropDown(
+                            ["CDI", "CDD", "Freelance", "Internship"],
+                            "Select",
+                            context,
+                            selectedCountry,
+                            (selected) {
+                              setState(() => selectedCountry = selected);
+                              jobController.contractType = selected;
+                            },
+                          ),
+                          SizedBox(height: 2.h),
+
                           text_widget(
-                            "*",
-                            color: Colors.red,
+                            "Coefficient ",
+                            color: Colors.black,
                             fontSize: 13.4.sp,
                             fontWeight: FontWeight.w500,
                           ),
+                          SizedBox(height: 0.8.h),
+                          textFieldWithPrefixSuffuxIconAndHintText(
+                            "Write here".tr,
+                            controller: jobController.coefficientController,
+                          ),
+
+                          SizedBox(height: 2.h),
+
+                          text_widget(
+                            "Start Date",
+                            color: Colors.black,
+                            fontSize: 13.4.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          SizedBox(height: 0.8.h),
+
+                          onPress(
+                            ontap: () => selectDate(context),
+                            child: textFieldWithPrefixSuffuxIconAndHintText(
+                              jobController.selectedDate != null
+                                  ? "${jobController.selectedDate!.day}/${jobController.selectedDate!.month}/${jobController.selectedDate!.year}"
+                                  : "Select".tr,
+                              enable: false,
+                              suffixIcon: "assets/icons/date.png",
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+
+                          text_widget(
+                            "Role Description",
+                            color: Colors.black,
+                            fontSize: 13.4.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          SizedBox(height: 0.8.h),
+                          textFieldWithPrefixSuffuxIconAndHintText(
+                            "Write here".tr,
+                            line: 5,
+                            controller: jobController.roleDescriptionController,
+                          ),
+
+                          SizedBox(height: 2.h),
+
+                          text_widget(
+                            "Number of Hours/week",
+                            color: Colors.black,
+                            fontSize: 13.4.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          SizedBox(height: 0.8.h),
+                          textFieldWithPrefixSuffuxIconAndHintText(
+                            "Write here".tr,
+                            controller: jobController.hoursController,
+                          ),
+
+                          SizedBox(height: 6.h),
+                          gradientButton(
+                            "Published",
+                            width: Get.width,
+                            ontap: () async {
+                              await jobController.addJob(true);
+                            },
+                            height: 5.5,
+                            isColor: true,
+                            font: 16,
+                            clr: MyColors.primary,
+                          ),
+                          SizedBox(height: 2.h),
+                          gradientButton(
+                            "On Hold",
+                            width: Get.width,
+                            ontap: () async {
+                              await jobController.addJob(false);
+                            },
+                            height: 5.5,
+                            isColor: false,
+                            txtColor: MyColors.primary,
+                            font: 16,
+                            clr: MyColors.white,
+                          ),
+                          SizedBox(height: 12.h),
                         ],
                       ),
-                      SizedBox(height: 0.8.h),
-                      customDropDown(
-                        ["Role1", "Role2", "Role3"],
-                        "Select",
-                        context,
-                        selectedCountry,
-                        (selected) {
-                          setState(() => selectedCountry = selected);
-                        },
-                      ),
-                      SizedBox(height: 2.h),
-
-                      text_widget(
-                        "Coefficient ",
-                        color: Colors.black,
-                        fontSize: 13.4.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
-
-                      SizedBox(height: 2.h),
-
-                      text_widget(
-                        "Start Date",
-                        color: Colors.black,
-                        fontSize: 13.4.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      SizedBox(height: 0.8.h),
-
-                      onPress(
-                        ontap: () => selectDate(context),
-
-                        child: textFieldWithPrefixSuffuxIconAndHintText(
-                          "Select".tr,
-
-                          enable: false,
-
-                          suffixIcon: "assets/icons/date.png",
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-
-                      text_widget(
-                        "Role Description",
-                        color: Colors.black,
-                        fontSize: 13.4.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText(
-                        "Write here".tr,
-
-                        line: 5,
-                      ),
-
-                      SizedBox(height: 2.h),
-
-                      text_widget(
-                        "Number of Hours/week",
-                        color: Colors.black,
-                        fontSize: 13.4.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      SizedBox(height: 0.8.h),
-                      textFieldWithPrefixSuffuxIconAndHintText("Write here".tr),
-
-                      SizedBox(height: 6.h),
-                      gradientButton(
-                        "Published",
-                        width: Get.width,
-                        ontap: () async {},
-                        height: 5.5,
-                        isColor: true,
-                        font: 16,
-                        clr: MyColors.primary,
-                      ),
-                      SizedBox(height: 2.h),
-                      gradientButton(
-                        "On Hold",
-                        width: Get.width,
-                        ontap: () async {},
-                        height: 5.5,
-                        isColor: false,
-                        txtColor: MyColors.primary,
-                        font: 16,
-                        clr: MyColors.white,
-                      ),
-                      SizedBox(height: 12.h),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ],

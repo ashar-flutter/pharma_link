@@ -31,6 +31,13 @@ class AuthController extends GetxController {
   TextEditingController rppsController = TextEditingController();
   File? profileImage, cv;
 
+
+  // Change password
+  TextEditingController oldPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+
   // vendorSide
   TextEditingController addressController = TextEditingController();
   TextEditingController countryController = TextEditingController();
@@ -356,4 +363,68 @@ class AuthController extends GetxController {
     await AuthServices.I.forgetPassword(context, emailController.text);
     Get.back();
   }
+
+
+  // Change password method ...
+  Future<void> changePassword(BuildContext context) async {
+    if (oldPasswordController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter old password");
+      return;
+    }
+    if (newPasswordController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter new password");
+      return;
+    }
+    if (newPasswordController.text.length < 6) {
+      EasyLoading.showInfo("Password must be at least 6 characters");
+      return;
+    }
+    if (confirmPasswordController.text.isEmpty) {
+      EasyLoading.showInfo("Please confirm password");
+      return;
+    }
+    if (newPasswordController.text != confirmPasswordController.text) {
+      EasyLoading.showInfo("Passwords do not match");
+      return;
+    }
+
+    LoadingService.I.show(context);
+
+    String error = await AuthServices.I.updatePassword(
+      context,
+      oldPasswordController.text,
+      newPasswordController.text,
+    );
+
+    LoadingService.I.dismiss();
+
+    if (error.isEmpty) {
+      EasyLoading.showSuccess("Password updated successfully");
+      oldPasswordController.clear();
+      newPasswordController.clear();
+      confirmPasswordController.clear();
+      Get.back();
+    } else {
+      EasyLoading.showError(error);
+    }
+  }
+
+
+  void addOwner(String name, String surname, String imageUrl) {
+    owners.add({
+      'name': name,
+      'sureName': surname,
+      'image': imageUrl,
+    });
+    update();
+  }
+
+  void removeOwner(int index) {
+    if (owners.isNotEmpty && index < owners.length) {
+      owners.removeAt(index);
+      update();
+    }
+  }
+
+
 }

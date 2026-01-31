@@ -2,22 +2,17 @@ import 'dart:async';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/models/job_model.dart';
 import 'package:linkpharma/page/home/filter_page.dart';
 import 'package:linkpharma/page/home/pharmaceydetail.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
-
-import 'package:remixicon/remixicon.dart';
-
 import 'dart:ui' as ui;
-
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -239,14 +234,14 @@ class SearchPageState extends State<SearchPage> {
                               final bool isLast = index == 2;
                               return onPress(
                                 ontap: () {
-                                  Get.to(PharmaceyDetail());
+                                  Get.to(PharmaceyDetail(job: JobModel(),));
                                 },
                                 child: Padding(
                                   padding: EdgeInsets.only(
                                     left: 18,
                                     right: isLast
                                         ? 18
-                                        : 0, // ✅ right padding only on last item
+                                        : 0,
                                   ),
                                   child: Container(
                                     decoration: BoxDecoration(

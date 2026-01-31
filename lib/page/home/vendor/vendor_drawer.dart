@@ -1,20 +1,15 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
-import 'package:linkpharma/page/auth/login_page.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
-import 'package:linkpharma/page/home/bottom_nav.dart';
 import 'package:linkpharma/page/home/contact.dart';
 import 'package:linkpharma/page/home/notification.dart';
 import 'package:linkpharma/page/home/privacy.dart';
-import 'package:linkpharma/page/home/savedpage.dart';
 import 'package:linkpharma/page/home/vendor/vendor_nav.dart';
 import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/widgets/showPopup.dart';
@@ -275,7 +270,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                           width: 32.w,
                           child: ListView.builder(
                             padding: EdgeInsets.symmetric(vertical: 80),
-
                             itemCount: titles.length,
                             itemBuilder: (BuildContext context, index) =>
                                 InkWell(

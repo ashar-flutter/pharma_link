@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/controller/job_controller.dart';
+import 'package:linkpharma/models/job_model.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-void showApplyDialog(BuildContext context) {
+void showApplyDialog(BuildContext context, JobModel job) {
+  final JobController controller = Get.find<JobController>();
+
   showDialog(
     context: context,
-    barrierDismissible: true,
-
+    barrierDismissible: false,
     builder: (_) {
       return Dialog(
         backgroundColor: Colors.transparent,
@@ -22,6 +25,7 @@ void showApplyDialog(BuildContext context) {
               children: [
                 onPress(
                   ontap: () {
+                    controller.applicationMessageController.clear();
                     Navigator.of(context).pop();
                   },
                   child: CircleAvatar(
@@ -35,7 +39,6 @@ void showApplyDialog(BuildContext context) {
             SizedBox(height: 1.5.h),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
-
               width: 90.w,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -46,7 +49,7 @@ void showApplyDialog(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Apply for Staff Pharmacist",
+                      "Apply for ${job.title}",
                       style: GoogleFonts.plusJakartaSans(
                         color: const Color(0xff1E1E1E),
                         fontSize: 18.sp,
@@ -56,7 +59,7 @@ void showApplyDialog(BuildContext context) {
                     SizedBox(height: 1.h),
 
                     Text(
-                      "Pharmacy Name Here",
+                      job.vendorName,
                       style: GoogleFonts.plusJakartaSans(
                         color: const Color.fromARGB(93, 30, 30, 30),
                         fontSize: 14.sp,
@@ -69,11 +72,9 @@ void showApplyDialog(BuildContext context) {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Spacer(),
-                        _infoChip("Part time", 3.h, 18.w),
+                        _infoChip("${job.hoursPerWeek} h", 3.h, 18.w),
                         SizedBox(width: 2.w),
-                        _infoChip("25 h", 2.5.h, 13.w),
-                        SizedBox(width: 2.w),
-                        _infoChip("CDI", 2.5.h, 18.w),
+                        _infoChip(job.contractType, 2.5.h, 13.w),
                         Spacer(),
                       ],
                     ),
@@ -107,6 +108,7 @@ void showApplyDialog(BuildContext context) {
                       child: Stack(
                         children: [
                           TextField(
+                            controller: controller.applicationMessageController,
                             maxLines: null,
                             maxLength: 500,
                             decoration: const InputDecoration(
@@ -123,7 +125,7 @@ void showApplyDialog(BuildContext context) {
                             bottom: 0,
                             right: 0,
                             child: Text(
-                              "0/500",
+                              "${controller.applicationMessageController.text.length}/500",
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.sp,
                                 color: Colors.grey,
@@ -135,7 +137,10 @@ void showApplyDialog(BuildContext context) {
                     ),
                     SizedBox(height: 2.h),
 
-                    Center(
+                    onPress(
+                      ontap: () {
+                        controller.applyForJob(job);
+                      },
                       child: Container(
                         height: 5.3.h,
                         width: 45.w,
@@ -171,7 +176,7 @@ Widget _infoChip(String text, double height, double width) {
     height: height,
     width: width,
     decoration: BoxDecoration(
-      color: MyColors.primary.withOpacity(0.12),
+      color: MyColors.primary.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(18),
     ),
     child: Text(

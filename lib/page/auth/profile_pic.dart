@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
-import 'package:linkpharma/page/home/user_drawer.dart';
-import 'package:linkpharma/page/home/vendor/pharmacy_add.dart';
-import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 

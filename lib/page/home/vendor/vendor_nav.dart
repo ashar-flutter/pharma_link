@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/home/chat/inbox_page.dart';
-import 'package:linkpharma/page/home/user_home.dart';
-import 'package:linkpharma/page/home/jobs_aplied.dart';
 import 'package:linkpharma/page/home/profile_page.dart';
 import 'package:linkpharma/page/home/vendor/joblist.dart';
 import 'package:linkpharma/page/home/vendor/vendor_home.dart';
@@ -33,7 +31,7 @@ class BottomNavVendor extends StatelessWidget {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 40,
                       offset: const Offset(0, -4),
                     ),
@@ -108,7 +106,7 @@ Widget _navItem({
               height: 2.3.h,
               color: isSelected
                   ? Colors.white
-                  : const Color(0xff1E1E1E).withOpacity(0.40),
+                  : const Color(0xff1E1E1E).withValues(alpha: 0.40),
             ),
           ),
         ),
@@ -150,30 +148,4 @@ class NavControllerD1 extends GetxController {
     selectedIndex = index;
     update();
   }
-}
-
-class UserHome extends StatelessWidget {
-  const UserHome({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Home Page"));
-}
-
-class InboxPage extends StatelessWidget {
-  const InboxPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Inbox Page"));
-}
-
-class AppliedJobsPage extends StatelessWidget {
-  const AppliedJobsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text("Applied Jobs Page"));
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text("Profile Page"));
 }

@@ -1,12 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/controller/job_controller.dart';
 import 'package:linkpharma/page/home/detail.dart';
-import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/ontap.dart';
-import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -18,62 +17,48 @@ class JobsAppliedPage extends StatefulWidget {
 }
 
 class JobsAppliedPageState extends State<JobsAppliedPage> {
-  final List<Job> jobList = [
-    Job(
-      pharmacyName: "Pharmacie du Centre",
-      dateTime: "23 Jun 2025 | 05:00 AM",
-      position: "Staff Pharmacist",
-      hours: "25 h",
-      contractType: "CDI",
-      workType: "Part time",
-      image: "assets/images/as51.png",
-    ),
-    Job(
-      pharmacyName: "Pharmacie Centrale",
-      dateTime: "24 Jun 2025 | 06:00 AM",
-      position: "Assistant Pharmacist",
-      hours: "30 h",
-      contractType: "CDI",
-      workType: "Full time",
-      image: "assets/images/as51.png",
-    ),
-    Job(
-      pharmacyName: "Pharmacie du Centre",
-      dateTime: "23 Jun 2025 | 05:00 AM",
-      position: "Staff Pharmacist",
-      hours: "25 h",
-      contractType: "CDI",
-      workType: "Part time",
-      image: "assets/images/as51.png",
-    ),
-    Job(
-      pharmacyName: "Pharmacie Centrale",
-      dateTime: "24 Jun 2025 | 06:00 AM",
-      position: "Assistant Pharmacist",
-      hours: "30 h",
-      contractType: "CDI",
-      workType: "Full time",
-      image: "assets/images/as51.png",
-    ),
-  ];
+  final JobController jobController = Get.find<JobController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      jobController.loadAppliedJobs();
+    });
+  }
+
+  String _getMonthName(int month) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month - 1];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: MyColors.primary,
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
-      body: Column(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Column(
-                children: [
-                  Row(
+    return GetBuilder<JobController>(
+      builder: (controller) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: MyColors.primary,
+          body: Column(
+            children: [
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: Row(
                     children: [
                       onPress(
                         ontap: () {
@@ -98,102 +83,180 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 2.h),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-              decoration: BoxDecoration(
-                color: Color(0xffFFFFFF),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
                 ),
               ),
-              child: ListView.separated(
-                padding: EdgeInsets.all(0),
-                itemCount: jobList.length,
-                separatorBuilder: (_, __) => SizedBox(height: 2.h),
-                itemBuilder: (BuildContext context, index) {
-                  final job = jobList[index];
-
-                  return onPress(
-                    ontap: () {
-                      Get.to(DetailPage());
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      height: 16.h,
-                      width: 100.w,
-                      decoration: BoxDecoration(
-                        color: Color(0xffF6F6F6),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(job.image, height: 13.h),
-                          SizedBox(width: 4.w),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 1,
-                              vertical: 9,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  job.pharmacyName,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Color(0xff10B66D),
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  job.dateTime,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Color.fromARGB(93, 30, 30, 30),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                SizedBox(height: 2.h),
-                                Text(
-                                  job.position,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: Color(0xff1E1E1E),
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 1.h),
-                                Row(
-                                  children: [
-                                    _jobInfoChip(job.hours),
-                                    SizedBox(width: 5),
-                                    _jobInfoChip(job.contractType),
-                                    SizedBox(width: 5),
-                                    _jobInfoChip(job.workType),
-                                  ],
-                                ),
-                              ],
+              SizedBox(height: 2.h),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: Color(0xffFFFFFF),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: controller.isLoadingAppliedJobs
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: MyColors.primary,
+                          ),
+                        )
+                      : controller.appliedJobs.isEmpty
+                      ? Center(
+                          child: Text(
+                            "No applications yet",
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Color(0xff1E1E1E),
+                              fontSize: 16.sp,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                        )
+                      : ListView.separated(
+                          padding: EdgeInsets.all(0),
+                          itemCount: controller.appliedJobs.length,
+                          separatorBuilder: (_, _) => SizedBox(height: 2.h),
+                          itemBuilder: (BuildContext context, index) {
+                            final applicationData =
+                                controller.appliedJobs[index];
+                            final application = applicationData['application'];
+                            final job = applicationData['job'];
+
+                            final appliedDate = DateTime.parse(
+                              application['appliedAt'],
+                            );
+                            final dateStr =
+                                "${appliedDate.day} ${_getMonthName(appliedDate.month)} ${appliedDate.year}";
+                            final timeStr =
+                                "${appliedDate.hour.toString().padLeft(2, '0')}:${appliedDate.minute.toString().padLeft(2, '0')}";
+
+                            return onPress(
+                              ontap: () {
+                                Get.to(DetailPage(job: job));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                height: 16.h,
+                                width: 100.w,
+                                decoration: BoxDecoration(
+                                  color: Color(0xffF6F6F6),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: 13.h,
+                                      width: 13.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        color: Colors.grey[200],
+                                      ),
+                                        child: job.vendorImage.isNotEmpty
+                                            ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
+                                          child: CachedNetworkImage(
+                                            imageUrl: job.vendorImage,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(16),
+                                                color: Colors.grey[200],
+                                              ),
+                                            ),
+                                            errorWidget: (context, url, error) => Container(
+                                              color: Colors.grey[200],
+                                            ),
+                                          ),
+                                        )
+                                            : null,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 9,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              job.vendorName,
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                    color: Color(0xff10B66D),
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                            ),
+                                            Text(
+                                              "$dateStr | $timeStr",
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                    color: Color.fromARGB(
+                                                      93,
+                                                      30,
+                                                      30,
+                                                      30,
+                                                    ),
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                            ),
+                                            SizedBox(height: 1.h),
+                                            Text(
+                                              job.title,
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                    color: Color(0xff1E1E1E),
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                            SizedBox(height: 1.h),
+                                            Row(
+                                              children: [
+                                                _jobInfoChip(
+                                                  "${job.hoursPerWeek} h",
+                                                ),
+                                                SizedBox(width: 5),
+                                                _jobInfoChip(job.contractType),
+                                                SizedBox(width: 5),
+                                                _jobInfoChip(
+                                                  job.hoursPerWeek.isNotEmpty &&
+                                                          int.tryParse(
+                                                                job.hoursPerWeek,
+                                                              ) !=
+                                                              null
+                                                      ? int.parse(
+                                                                  job.hoursPerWeek,
+                                                                ) <
+                                                                30
+                                                            ? "Part time"
+                                                            : "Full time"
+                                                      : "Full time",
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -216,24 +279,4 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
       ),
     );
   }
-}
-
-class Job {
-  final String pharmacyName;
-  final String dateTime;
-  final String position;
-  final String hours;
-  final String contractType;
-  final String workType;
-  final String image;
-
-  Job({
-    required this.pharmacyName,
-    required this.dateTime,
-    required this.position,
-    required this.hours,
-    required this.contractType,
-    required this.workType,
-    required this.image,
-  });
 }

@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:linkpharma/config/global.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/home/bottom_nav.dart';
@@ -11,8 +13,27 @@ import 'package:linkpharma/page/home/search_page.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class UserHomePage extends StatelessWidget {
+import '../../controller/job_controller.dart';
+import '../../models/job_model.dart';
+
+class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
+
+  @override
+  State<UserHomePage> createState() => _UserHomePageState();
+}
+
+class _UserHomePageState extends State<UserHomePage> {
+  Map<String, bool> expandedAreas = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.find<JobController>().loadSavedJobs();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +41,7 @@ class UserHomePage extends StatelessWidget {
       backgroundColor: MyColors.primary,
       body: SafeArea(
         child: Container(
+          margin: EdgeInsets.zero,
           child: Column(
             children: [
               Padding(
@@ -53,10 +75,34 @@ class UserHomePage extends StatelessWidget {
                             Get.find<NavControllerD>().selectedIndex = 3;
                             Get.find<NavControllerD>().update();
                           },
-                          child: Image.asset(
-                            "assets/images/as11.png",
-                            height: 4.h,
-                          ),
+                          child: currentUser.image.isNotEmpty
+                              ? CircleAvatar(
+                                  radius: 2.h,
+                                  backgroundColor: Colors.white,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: CachedNetworkImage(
+                                      imageUrl: currentUser.image,
+                                      height: 4.h,
+                                      width: 4.h,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          CircleAvatar(
+                                            radius: 2.h,
+                                            backgroundColor: Colors.white,
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          CircleAvatar(
+                                            radius: 2.h,
+                                            backgroundColor: Colors.white,
+                                          ),
+                                    ),
+                                  ),
+                                )
+                              : CircleAvatar(
+                                  radius: 2.h,
+                                  backgroundColor: Colors.white,
+                                ),
                         ),
                       ],
                     ),
@@ -141,354 +187,210 @@ class UserHomePage extends StatelessWidget {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 18.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Toulouse",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: const Color(0xff1E1E1E),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Spacer(),
-                                Text(
-                                  "See All",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    decoration: TextDecoration.underline,
-                                    color: const Color(0xff10B66D),
-                                    decorationColor: MyColors.primary,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(3, (index) {
-                                final bool isLast = index == 2;
+                  child: GetBuilder<JobController>(
+                    builder: (controller) {
+                      Map<String, List<JobModel>> groupedJobs = controller
+                          .getJobsGroupedByAddress();
 
-                                return onPress(
-                                  ontap: () {
-                                    Get.to(PharmaceyDetail());
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      left: 18,
-                                      right: isLast
-                                          ? 18
-                                          : 0, // ✅ right padding only on last item
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xffF6F6F6),
-                                        borderRadius: BorderRadius.circular(18),
+                      if (groupedJobs.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No jobs available",
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: const Color(0xff1E1E1E),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 18.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: groupedJobs.entries.map((entry) {
+                              String areaName = entry.key;
+                              List<JobModel> areaJobs = entry.value;
+
+                              bool isExpanded =
+                                  expandedAreas[areaName] ?? false;
+                              List<JobModel> jobsToShow =
+                                  isExpanded || areaJobs.length <= 3
+                                  ? areaJobs
+                                  : areaJobs.sublist(0, 3);
+
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 3.h),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18.0,
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      child: Row(
                                         children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(18),
-                                                ),
-                                            child: Image.asset(
-                                              "assets/images/as52.png",
-                                              width: 40.w,
-                                              height: 14.h,
-                                              fit: BoxFit.cover,
+                                          Text(
+                                            areaName,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              color: const Color(0xff1E1E1E),
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 6,
-                                            ),
-                                            child: Text(
-                                              "Pharmacie du Centre",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color(
-                                                      0xff1E1E1E,
+                                          Spacer(),
+                                          if (areaJobs.length > 3)
+                                            onPress(
+                                              ontap: () {
+                                                setState(() {
+                                                  expandedAreas[areaName] =
+                                                      !isExpanded;
+                                                });
+                                              },
+                                              child: Text(
+                                                isExpanded
+                                                    ? "Show Less"
+                                                    : "See All",
+                                                style:
+                                                    GoogleFonts.plusJakartaSans(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: const Color(
+                                                        0xff10B66D,
+                                                      ),
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
-                                                    fontSize: 14.5.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                            ),
-                                            child: Text(
-                                              "Pharmacist-Full Time,\nInternship, Assistant",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color.fromARGB(
-                                                      110,
-                                                      30,
-                                                      30,
-                                                      30,
-                                                    ),
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 1.h),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Blagnac",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: const Color(0xff1E1E1E),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Spacer(),
-                                Text(
-                                  "See All",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    decoration: TextDecoration.underline,
-                                    color: const Color(0xff10B66D),
-                                    decorationColor: MyColors.primary,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(3, (index) {
-                                final bool isLast = index == 2;
-
-                                return onPress(
-                                  ontap: () {
-                                    Get.to(PharmaceyDetail());
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      left: 18,
-                                      right: isLast
-                                          ? 18
-                                          : 0, // ✅ right padding only on last item
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xffF6F6F6),
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(18),
+                                    SizedBox(height: 1.h),
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: jobsToShow.map((job) {
+                                          return onPress(
+                                            ontap: () {
+                                              Get.to(PharmaceyDetail(job: job));
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                left: 18,
+                                                right:
+                                                    jobsToShow.indexOf(job) ==
+                                                        jobsToShow.length - 1
+                                                    ? 18
+                                                    : 0,
+                                              ),
+                                              child: Container(
+                                                width: 40.w,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xffF6F6F6,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(18),
                                                 ),
-                                            child: Image.asset(
-                                              "assets/images/as52.png",
-                                              width: 40.w,
-                                              height: 14.h,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 6,
-                                            ),
-                                            child: Text(
-                                              "Pharmacie du Centre",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color(
-                                                      0xff1E1E1E,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          const BorderRadius.vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                  18,
+                                                                ),
+                                                          ),
+                                                      child: Container(
+                                                        width: 40.w,
+                                                        height: 14.h,
+                                                        color: Colors.grey[200],
+                                                        child:
+                                                            job
+                                                                .vendorImage
+                                                                .isNotEmpty
+                                                            ? CachedNetworkImage(
+                                                                imageUrl: job
+                                                                    .vendorImage,
+                                                                width: 40.w,
+                                                                height: 14.h,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              )
+                                                            : null,
+                                                      ),
                                                     ),
-                                                    fontSize: 14.5.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                            ),
-                                            child: Text(
-                                              "Pharmacist-Full Time,\nInternship, Assistant",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color.fromARGB(
-                                                      110,
-                                                      30,
-                                                      30,
-                                                      30,
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 6,
+                                                          ),
+                                                      child: Text(
+                                                        job.vendorName,
+                                                        style:
+                                                            GoogleFonts.plusJakartaSans(
+                                                              color:
+                                                                  const Color(
+                                                                    0xff1E1E1E,
+                                                                  ),
+                                                              fontSize: 14.5.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
                                                     ),
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 1.h),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-
-                          SizedBox(height: 3.h),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Colomiers",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: const Color(0xff1E1E1E),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Spacer(),
-                                Text(
-                                  "See All",
-                                  style: GoogleFonts.plusJakartaSans(
-                                    decoration: TextDecoration.underline,
-                                    color: const Color(0xff10B66D),
-                                    decorationColor: MyColors.primary,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(3, (index) {
-                                final bool isLast = index == 2;
-
-                                return onPress(
-                                  ontap: () {
-                                    Get.to(PharmaceyDetail());
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      left: 18,
-                                      right: isLast
-                                          ? 18
-                                          : 0, // ✅ right padding only on last item
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xffF6F6F6),
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(18),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                          ),
+                                                      child: Text(
+                                                        "${job.title} - ${job.contractType}",
+                                                        style: GoogleFonts.plusJakartaSans(
+                                                          color:
+                                                              const Color.fromARGB(
+                                                                110,
+                                                                30,
+                                                                30,
+                                                                30,
+                                                              ),
+                                                          fontSize: 13.sp,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 1.h),
+                                                  ],
                                                 ),
-                                            child: Image.asset(
-                                              "assets/images/as52.png",
-                                              width: 40.w,
-                                              height: 14.h,
-                                              fit: BoxFit.cover,
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 6,
-                                            ),
-                                            child: Text(
-                                              "Pharmacie du Centre",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color(
-                                                      0xff1E1E1E,
-                                                    ),
-                                                    fontSize: 14.5.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                            ),
-                                            child: Text(
-                                              "Pharmacist-Full Time,\nInternship, Assistant",
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: const Color.fromARGB(
-                                                      110,
-                                                      30,
-                                                      30,
-                                                      30,
-                                                    ),
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 1.h),
-                                        ],
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/config/global.dart';
-import 'package:linkpharma/page/auth/login_page.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/home/bottom_nav.dart';
 import 'package:linkpharma/page/home/contact.dart';
@@ -20,7 +18,6 @@ import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/widgets/showPopup.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 
-import 'package:remixicon/remixicon.dart';
 
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -374,7 +371,9 @@ class UserDrawerController extends GetxController {
   final zoomDrawerController = ZoomDrawerController();
   bool open = false;
   void toggleDrawer() {
-    print("Toggle drawer");
+    if (kDebugMode) {
+      print("Toggle drawer");
+    }
     Timer(const Duration(microseconds: 30), () {
       open = true;
 
@@ -387,7 +386,9 @@ class UserDrawerController extends GetxController {
   int active = 0;
 
   void closeDrawer() {
-    print("Close drawer");
+    if (kDebugMode) {
+      print("Close drawer");
+    }
     Timer(const Duration(microseconds: 800), () {
       open = false;
 

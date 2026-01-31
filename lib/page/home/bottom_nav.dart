@@ -149,29 +149,3 @@ class NavControllerD extends GetxController {
     update();
   }
 }
-
-class UserHome extends StatelessWidget {
-  const UserHome({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Home Page"));
-}
-
-class InboxPage extends StatelessWidget {
-  const InboxPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Inbox Page"));
-}
-
-class AppliedJobsPage extends StatelessWidget {
-  const AppliedJobsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text("Applied Jobs Page"));
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text("Profile Page"));
-}
