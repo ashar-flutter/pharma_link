@@ -171,6 +171,36 @@ class FirestoreServices {
     }
   }
 
+  Future<List<JobModel>> getJobsForCurrentVendor(String vendorId) async {
+    try {
+      final snapshot = await _instance
+          .collection('jobs')
+          .where('vendorId', isEqualTo: vendorId)
+          .get();
+
+      List<JobModel> jobs = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        JobModel job = JobModel.fromJson(data);
+
+        if (job.vendorId == vendorId) {
+          jobs.add(job);
+        }
+      }
+
+      jobs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return jobs;
+    } catch (e) {
+      logger.e("Error getting current vendor jobs: $e");
+      return [];
+    }
+  }
+
+
+
+
   Stream<List<JobModel>> getVendorJobsStream(String vendorId) {
     return _instance
         .collection('jobs')

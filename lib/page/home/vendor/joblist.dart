@@ -9,7 +9,9 @@ import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../../config/global.dart';
 import '../../../controller/job_controller.dart';
+import '../../../models/job_model.dart';
 
 class VendorJobLists extends StatefulWidget {
   const VendorJobLists({super.key});
@@ -21,6 +23,16 @@ class VendorJobLists extends StatefulWidget {
 class _VendorJobListsState extends State<VendorJobLists> {
   int selectedFilter = 0;
   final List<String> filters = ["All Position", "Active", "Inactive"];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currentUser.userType == 2) {
+        Get.find<JobController>().loadVendorJobs();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,15 +100,31 @@ class _VendorJobListsState extends State<VendorJobLists> {
                   ),
                   child: GetBuilder<JobController>(
                     builder: (jobController) {
-                      List filteredJobs = [];
+                      if (currentUser.userType != 2) {
+                        return Center(child: Text("Access denied"));
+                      }
+
+                      List<JobModel> filteredJobs = [];
+
+                      List<JobModel> vendorJobs = jobController.allJobs
+                          .where((job) => job.vendorId == currentUser.id)
+                          .toList();
 
                       if (selectedFilter == 0) {
-                        filteredJobs = jobController.allJobs;
+                        filteredJobs = vendorJobs;
                       } else if (selectedFilter == 1) {
-                        filteredJobs = jobController.activeJobs;
+                        filteredJobs = vendorJobs
+                            .where((job) => job.isActive)
+                            .toList();
                       } else if (selectedFilter == 2) {
-                        filteredJobs = jobController.inactiveJobs;
+                        filteredJobs = vendorJobs
+                            .where((job) => !job.isActive)
+                            .toList();
                       }
+
+                      filteredJobs = filteredJobs
+                          .where((job) => job.vendorId == currentUser.id)
+                          .toList();
 
                       return SingleChildScrollView(
                         child: Padding(
@@ -105,7 +133,9 @@ class _VendorJobListsState extends State<VendorJobLists> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                children: List.generate(filters.length, (index) {
+                                children: List.generate(filters.length, (
+                                  index,
+                                ) {
                                   final isSelected = selectedFilter == index;
                                   return Padding(
                                     padding: EdgeInsets.only(right: 2.w),
@@ -123,14 +153,21 @@ class _VendorJobListsState extends State<VendorJobLists> {
                                           color: isSelected
                                               ? Color(0xff1E1E1E)
                                               : Color(0xffF6F6F6),
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
                                         ),
                                         child: Text(
                                           filters[index],
                                           style: GoogleFonts.plusJakartaSans(
                                             color: isSelected
                                                 ? Colors.white
-                                                : Color.fromARGB(112, 30, 30, 30),
+                                                : Color.fromARGB(
+                                                    112,
+                                                    30,
+                                                    30,
+                                                    30,
+                                                  ),
                                             fontSize: 13.sp,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -144,7 +181,9 @@ class _VendorJobListsState extends State<VendorJobLists> {
                               if (filteredJobs.isEmpty)
                                 Center(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10.h,
+                                    ),
                                     child: Text(
                                       "No jobs found",
                                       style: GoogleFonts.plusJakartaSans(
@@ -159,7 +198,11 @@ class _VendorJobListsState extends State<VendorJobLists> {
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: filteredJobs.length,
                                 itemBuilder: (BuildContext context, index) {
-                                  return JobCard(job: filteredJobs[index]);
+                                  final job = filteredJobs[index];
+                                  if (job.vendorId != currentUser.id) {
+                                    return SizedBox();
+                                  }
+                                  return JobCard(job: job);
                                 },
                               ),
                               Center(
@@ -210,6 +253,10 @@ class JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (currentUser.userType == 2 && job.vendorId != currentUser.id) {
+      return SizedBox();
+    }
+
     return onPress(
       ontap: () {
         Get.to(VendorJobsDetailPage());
@@ -241,7 +288,9 @@ class JobCard extends StatelessWidget {
                   height: 3.h,
                   width: 23.w,
                   decoration: BoxDecoration(
-                    color: (job.isActive ?? true) ? Color(0xff10B66D) : Color(0xff1E1E1E),
+                    color: (job.isActive ?? true)
+                        ? Color(0xff10B66D)
+                        : Color(0xff1E1E1E),
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Text(

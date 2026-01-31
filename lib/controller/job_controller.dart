@@ -20,17 +20,35 @@ class JobController extends GetxController {
   // ===================== VARIABLES =====================
   String? contractType;
   DateTime? selectedDate;
-  List<JobModel> allJobs = [];
+
+  // ===================== CRITICAL FIX: SEPARATE DATA STORAGE =====================
+  List<JobModel> _allUserJobs = [];
+  List<JobModel> _allVendorJobs = [];
+
+  // Vendor cache
   Map<String, UserModel> vendorCache = {};
+
+  // User specific data
   List<Map<String, dynamic>> appliedJobs = [];
+  List<Map<String, dynamic>> savedJobs = [];
   bool isLoadingAppliedJobs = false;
+  bool isLoadingSavedJobs = false;
 
   @override
   void onInit() {
     super.onInit();
-    loadJobs();
-    loadSavedJobs();
-    loadAppliedJobs();
+    _loadDataBasedOnUserType();
+  }
+
+  // ===================== PRIVATE FUNCTION: USER TYPE CHECK =====================
+  void _loadDataBasedOnUserType() {
+    if (currentUser.userType == 1) { // USER
+      loadJobs();
+      loadSavedJobs();
+      loadAppliedJobs();
+    } else if (currentUser.userType == 2) { // VENDOR
+      loadVendorJobs();
+    }
   }
 
   // ===================== USER SIDE - JOB APPLICATIONS =====================
@@ -150,7 +168,7 @@ class JobController extends GetxController {
     Map<String, List<JobModel>> groupedJobs = {};
     String userCity = currentUser.city;
 
-    List<JobModel> cityJobs = allJobs
+    List<JobModel> cityJobs = _allUserJobs
         .where((job) => job.isActive && job.vendorCity == userCity)
         .toList();
 
@@ -169,9 +187,6 @@ class JobController extends GetxController {
   }
 
   // ===================== SAVED JOBS FUNCTIONS =====================
-  List<Map<String, dynamic>> savedJobs = [];
-  bool isLoadingSavedJobs = false;
-
   Future<void> loadSavedJobs() async {
     if (isLoadingSavedJobs) return;
 
@@ -233,7 +248,6 @@ class JobController extends GetxController {
     return false;
   }
 
-
   // ===================== VENDOR SIDE - JOB MANAGEMENT =====================
   Future<void> addJob(bool isActive) async {
     if (titleController.text.isEmpty) {
@@ -282,7 +296,11 @@ class JobController extends GetxController {
 
     try {
       await FirestoreServices.I.addJob(newJob);
-      await loadVendorJobs();
+
+      if (currentUser.userType == 2) {
+        await loadVendorJobs();
+      }
+
       clearFields();
       EasyLoading.showSuccess(
         isActive ? "Job published" : "Job saved as draft",
@@ -294,14 +312,56 @@ class JobController extends GetxController {
   }
 
   Future<void> loadVendorJobs() async {
-    allJobs = await FirestoreServices.I.getVendorJobs(currentUser.id);
-    update();
+    if (currentUser.userType != 2) return;
+
+    try {
+      _allVendorJobs = await FirestoreServices.I.getVendorJobs(currentUser.id);
+
+      _allVendorJobs = _allVendorJobs.where((job) =>
+      job.vendorId == currentUser.id
+      ).toList();
+
+      update();
+    } catch (e) {
+      _allVendorJobs = [];
+      update();
+    }
+  }
+
+  List<JobModel> get allJobs {
+    if (currentUser.userType == 1) {
+      return _allUserJobs;
+    } else {
+      return _allVendorJobs;
+    }
+  }
+
+  List<JobModel> get activeJobs {
+    if (currentUser.userType == 1) {
+      return _allUserJobs.where((job) => job.isActive).toList();
+    } else {
+      return _allVendorJobs.where((job) => job.isActive).toList();
+    }
+  }
+
+  List<JobModel> get inactiveJobs {
+    if (currentUser.userType == 1) {
+      return _allUserJobs.where((job) => !job.isActive).toList();
+    } else {
+      return _allVendorJobs.where((job) => !job.isActive).toList();
+    }
   }
 
   List<JobModel> getJobsForVendor(String vendorId) {
-    return allJobs
-        .where((job) => job.isActive && job.vendorId == vendorId)
-        .toList();
+    if (currentUser.userType == 2) {
+      return _allVendorJobs
+          .where((job) => job.isActive && job.vendorId == vendorId)
+          .toList();
+    } else {
+      return _allUserJobs
+          .where((job) => job.isActive && job.vendorId == vendorId)
+          .toList();
+    }
   }
 
   List<JobModel> getJobsByType(String type, String vendorId) {
@@ -316,8 +376,20 @@ class JobController extends GetxController {
 
   // ===================== COMMON FUNCTIONS =====================
   Future<void> loadJobs() async {
-    allJobs = await FirestoreServices.I.getAllActiveJobs();
-    update();
+    if (currentUser.userType != 1) return;
+
+    try {
+      _allUserJobs = await FirestoreServices.I.getAllActiveJobs();
+
+      _allUserJobs = _allUserJobs.where((job) =>
+      job.isActive && job.vendorCity == currentUser.city
+      ).toList();
+
+      update();
+    } catch (e) {
+      _allUserJobs = [];
+      update();
+    }
   }
 
   Future<UserModel> getVendorData(String vendorId) async {
@@ -326,11 +398,6 @@ class JobController extends GetxController {
     vendorCache[vendorId] = vendor;
     return vendor;
   }
-
-  List<JobModel> get activeJobs =>
-      allJobs.where((job) => job.isActive).toList();
-  List<JobModel> get inactiveJobs =>
-      allJobs.where((job) => !job.isActive).toList();
 
   void clearFields() {
     titleController.clear();
@@ -342,7 +409,9 @@ class JobController extends GetxController {
   }
 
   bool hasJobsInUserCity() {
+    if (currentUser.userType != 1) return false;
+
     String userCity = currentUser.city;
-    return allJobs.any((job) => job.isActive && job.vendorCity == userCity);
+    return _allUserJobs.any((job) => job.isActive && job.vendorCity == userCity);
   }
 }
