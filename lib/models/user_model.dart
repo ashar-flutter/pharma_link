@@ -26,16 +26,18 @@ class UserModel {
   List<String> images = [];
   List<String> services = [];
 
+
   List<Map<String, dynamic>> schedule = [
-    {"start": null, "end": null}, // Mo
-    {"start": null, "end": null}, // Tu
-    {"start": null, "end": null}, // We
-    {"start": null, "end": null}, // Th
-    {"start": null, "end": null}, // Fr
-    {"start": null, "end": null}, // Sa
-    {"start": null, "end": null}, // Su
+    {"isOpen": true, "start": "08:30", "end": "19:00"}, // Mo
+    {"isOpen": true, "start": "08:30", "end": "19:00"}, // Tu
+    {"isOpen": true, "start": "08:30", "end": "19:00"}, // We
+    {"isOpen": true, "start": "08:30", "end": "19:00"}, // Th
+    {"isOpen": true, "start": "08:30", "end": "19:00"}, // Fr
+    {"isOpen": false, "start": "Closed", "end": ""}, // Sa
+    {"isOpen": false, "start": "Closed", "end": ""}, // Su
   ];
-  List<Map<String, dynamic>> owners = []; // {id, name, image, surename}
+
+  List<Map<String, dynamic>> owners = []; // {id, name, image, surname}
   List<String> pharmacies = []; // pharmacy_ids
 
   UserModel();
@@ -63,7 +65,18 @@ class UserModel {
     siret = json['siret'];
     images = List<String>.from(json['images']);
     services = List<String>.from(json['services']);
-    schedule = List<Map<String, dynamic>>.from(json['schedule']);
+
+    //  SCHEDULE FIX: Proper loading
+    schedule = List<Map<String, dynamic>>.from(json['schedule'] ?? [
+      {"isOpen": true, "start": "08:30", "end": "19:00"},
+      {"isOpen": true, "start": "08:30", "end": "19:00"},
+      {"isOpen": true, "start": "08:30", "end": "19:00"},
+      {"isOpen": true, "start": "08:30", "end": "19:00"},
+      {"isOpen": true, "start": "08:30", "end": "19:00"},
+      {"isOpen": false, "start": "Closed", "end": ""},
+      {"isOpen": false, "start": "Closed", "end": ""},
+    ]);
+
     owners = List<Map<String, dynamic>>.from(json['owners']);
     pharmacies = List<String>.from(json['pharmacies']);
   }
@@ -92,7 +105,9 @@ class UserModel {
     data['siret'] = siret;
     data['images'] = images;
     data['services'] = services;
+
     data['schedule'] = schedule;
+
     data['owners'] = owners;
     data['pharmacies'] = pharmacies;
     return data;

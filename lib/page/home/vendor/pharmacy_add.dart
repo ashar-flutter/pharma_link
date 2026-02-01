@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -666,7 +667,36 @@ class PharmacyAdd extends StatelessWidget {
         gradientButton(
           "Save",
           width: Get.width,
-          ontap: () => con.page3(context),
+
+          ontap: () async {
+            try {
+              final WokringState? workingState = context
+                  .findAncestorStateOfType<WokringState>();
+
+              if (workingState != null) {
+                for (int i = 0; i < 7; i++) {
+                  var day = workingState.workingTimeModel.days[i];
+
+                  currentUser.schedule[i] = {
+                    "isOpen": day["isOpen"] ?? (i < 5),
+                    "start": day["isOpen"] == true
+                        ? (day["start"] as TimeOfDay).format(context)
+                        : "Closed",
+                    "end": day["isOpen"] == true
+                        ? (day["end"] as TimeOfDay).format(context)
+                        : "",
+                  };
+                }
+              }
+            } catch (e) {
+              if (kDebugMode) {
+                print("Error saving schedule: $e");
+              }
+            }
+
+            // Proceed with save
+            con.page3(context);
+          },
           height: 5.5,
           isColor: true,
           font: 16,
@@ -919,7 +949,7 @@ class WokringState extends State<Wokring> {
       height: 1,
       indent: 4.w,
       endIndent: 4.w,
-      color: Colors.grey.withOpacity(0.1),
+      color: Colors.grey.withValues(alpha: 0.1),
     );
   }
 }

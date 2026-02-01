@@ -197,6 +197,19 @@ class SignupUserPage extends StatelessWidget {
                                   ),
                                   SizedBox(height: 2.h),
                                   text_widget(
+                                    "Country",
+                                    color: Colors.black,
+                                    fontSize: 13.4.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  SizedBox(height: 0.8.h),
+                                  textFieldWithPrefixSuffuxIconAndHintText(
+                                    "Enter your country (e.g., France, Pakistan)".tr,
+                                    prefixIcon: Icons.public_outlined,
+                                    controller: con.userCountryController,
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  text_widget(
                                     "Role",
                                     color: Colors.black,
                                     fontSize: 13.4.sp,

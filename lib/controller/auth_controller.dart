@@ -26,17 +26,16 @@ class AuthController extends GetxController {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController cityController = TextEditingController();
+  TextEditingController userCountryController = TextEditingController();
   String? role;
   TextEditingController experienceController = TextEditingController();
   TextEditingController rppsController = TextEditingController();
   File? profileImage, cv;
 
-
   // Change password
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-
 
   // vendorSide
   TextEditingController addressController = TextEditingController();
@@ -53,6 +52,16 @@ class AuthController extends GetxController {
 
   AuthController() {
     emailController.text = currentUser.email;
+    if (currentUser.id.isNotEmpty) {
+      firstNameController.text = currentUser.firstName;
+      lastNameController.text = currentUser.lastName;
+      cityController.text = currentUser.city;
+      userCountryController.text = currentUser.country;
+      role = currentUser.role;
+      experienceController.text = currentUser.experience;
+      rppsController.text = currentUser.rpps;
+      descriptionController.text = currentUser.description;
+    }
   }
 
   Future<void> loginWithEmail(BuildContext context) async {
@@ -125,6 +134,11 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please enter a city");
       return;
     }
+    if (userCountryController.text.trim().isEmpty) {
+      // <-- .trim() ADD KARO
+      EasyLoading.showInfo("Please enter your country");
+      return;
+    }
     if (role == null) {
       EasyLoading.showInfo("Select the role");
       return;
@@ -154,6 +168,8 @@ class AuthController extends GetxController {
     currentUser.lastName = lastNameController.text;
     currentUser.email = emailController.text;
     currentUser.city = cityController.text;
+    currentUser.country = userCountryController.text
+        .trim(); // <-- .trim() ADD KARO
     currentUser.role = role!;
     currentUser.experience = experienceController.text;
     currentUser.rpps = rppsController.text;
@@ -194,7 +210,8 @@ class AuthController extends GetxController {
       EasyLoading.showInfo("Please enter a city");
       return;
     }
-    if (countryController.text.isEmpty) {
+    if (countryController.text.trim().isEmpty) {
+      // <-- .trim() ADD KARO VENDOR KE LIYE BHI
       EasyLoading.showInfo("Please enter a country");
       return;
     }
@@ -267,7 +284,7 @@ class AuthController extends GetxController {
     currentUser.address = addressController.text;
     currentUser.zipCode = zipCodeController.text;
     currentUser.city = cityController.text;
-    currentUser.country = countryController.text;
+    currentUser.country = countryController.text.trim(); // <-- .trim() ADD KARO
     currentUser.email = emailController.text;
     currentUser.siret = siretController.text;
     currentUser.images = await Future.wait(
@@ -364,7 +381,6 @@ class AuthController extends GetxController {
     Get.back();
   }
 
-
   // Change password method ...
   Future<void> changePassword(BuildContext context) async {
     if (oldPasswordController.text.isEmpty) {
@@ -409,13 +425,8 @@ class AuthController extends GetxController {
     }
   }
 
-
   void addOwner(String name, String surname, String imageUrl) {
-    owners.add({
-      'name': name,
-      'sureName': surname,
-      'image': imageUrl,
-    });
+    owners.add({'name': name, 'sureName': surname, 'image': imageUrl});
     update();
   }
 
@@ -425,6 +436,4 @@ class AuthController extends GetxController {
       update();
     }
   }
-
-
 }

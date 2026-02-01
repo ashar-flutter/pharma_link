@@ -24,16 +24,33 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  Map<String, bool> expandedAreas = {};
+  Map<String, bool> expandedCities = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.find<JobController>().loadSavedJobs();
+      Get.find<JobController>().loadJobs();
     });
+
+    _scrollController.addListener(_scrollListener);
   }
 
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      Get.find<JobController>().loadMoreJobs();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,32 +94,32 @@ class _UserHomePageState extends State<UserHomePage> {
                           },
                           child: currentUser.image.isNotEmpty
                               ? CircleAvatar(
-                                  radius: 2.h,
-                                  backgroundColor: Colors.white,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: CachedNetworkImage(
-                                      imageUrl: currentUser.image,
-                                      height: 4.h,
-                                      width: 4.h,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          CircleAvatar(
-                                            radius: 2.h,
-                                            backgroundColor: Colors.white,
-                                          ),
-                                      errorWidget: (context, url, error) =>
-                                          CircleAvatar(
-                                            radius: 2.h,
-                                            backgroundColor: Colors.white,
-                                          ),
+                            radius: 2.h,
+                            backgroundColor: Colors.white,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: CachedNetworkImage(
+                                imageUrl: currentUser.image,
+                                height: 4.h,
+                                width: 4.h,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    CircleAvatar(
+                                      radius: 2.h,
+                                      backgroundColor: Colors.white,
                                     ),
-                                  ),
-                                )
+                                errorWidget: (context, url, error) =>
+                                    CircleAvatar(
+                                      radius: 2.h,
+                                      backgroundColor: Colors.white,
+                                    ),
+                              ),
+                            ),
+                          )
                               : CircleAvatar(
-                                  radius: 2.h,
-                                  backgroundColor: Colors.white,
-                                ),
+                            radius: 2.h,
+                            backgroundColor: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -189,42 +206,46 @@ class _UserHomePageState extends State<UserHomePage> {
                   ),
                   child: GetBuilder<JobController>(
                     builder: (controller) {
-                      Map<String, List<JobModel>> groupedJobs = controller
-                          .getJobsGroupedByAddress();
+                      List<String> cities = controller.getCitiesWithJobs();
 
-                      if (groupedJobs.isEmpty) {
+                      if (cities.isEmpty && !controller.isLoadingMore) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "No jobs available",
+                                "No jobs available in ${currentUser.country}",
                                 style: GoogleFonts.plusJakartaSans(
                                   color: const Color(0xff1E1E1E),
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
+                              SizedBox(height: 2.h),
+                              if (controller.hasMoreJobs)
+                                CircularProgressIndicator(),
                             ],
                           ),
                         );
                       }
 
                       return SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 18.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: groupedJobs.entries.map((entry) {
-                              String areaName = entry.key;
-                              List<JobModel> areaJobs = entry.value;
+                        controller: _scrollController,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
 
-                              bool isExpanded =
-                                  expandedAreas[areaName] ?? false;
+                            SizedBox(height: 1.h),
+                            ...cities.map((city) {
+                              List<JobModel> cityJobs = controller.getJobsByCity(city);
+
+                              if (cityJobs.isEmpty) return SizedBox();
+
+                              bool isExpanded = expandedCities[city] ?? false;
                               List<JobModel> jobsToShow =
-                                  isExpanded || areaJobs.length <= 3
-                                  ? areaJobs
-                                  : areaJobs.sublist(0, 3);
+                              isExpanded || cityJobs.length <= 3
+                                  ? cityJobs
+                                  : cityJobs.sublist(0, 3);
 
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 3.h),
@@ -238,7 +259,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                       child: Row(
                                         children: [
                                           Text(
-                                            areaName,
+                                            city,
                                             style: GoogleFonts.plusJakartaSans(
                                               color: const Color(0xff1E1E1E),
                                               fontSize: 16.sp,
@@ -246,29 +267,21 @@ class _UserHomePageState extends State<UserHomePage> {
                                             ),
                                           ),
                                           Spacer(),
-                                          if (areaJobs.length > 3)
+                                          if (cityJobs.length > 3)
                                             onPress(
                                               ontap: () {
                                                 setState(() {
-                                                  expandedAreas[areaName] =
-                                                      !isExpanded;
+                                                  expandedCities[city] = !isExpanded;
                                                 });
                                               },
                                               child: Text(
-                                                isExpanded
-                                                    ? "Show Less"
-                                                    : "See All",
-                                                style:
-                                                    GoogleFonts.plusJakartaSans(
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      color: const Color(
-                                                        0xff10B66D,
-                                                      ),
-                                                      fontSize: 13.sp,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
+                                                isExpanded ? "Show Less" : "See All",
+                                                style: GoogleFonts.plusJakartaSans(
+                                                  decoration: TextDecoration.underline,
+                                                  color: const Color(0xff10B66D),
+                                                  fontSize: 13.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                         ],
@@ -286,91 +299,59 @@ class _UserHomePageState extends State<UserHomePage> {
                                             child: Padding(
                                               padding: EdgeInsets.only(
                                                 left: 18,
-                                                right:
-                                                    jobsToShow.indexOf(job) ==
-                                                        jobsToShow.length - 1
-                                                    ? 18
-                                                    : 0,
+                                                right: jobsToShow.indexOf(job) == jobsToShow.length - 1 ? 18 : 0,
                                               ),
                                               child: Container(
                                                 width: 40.w,
                                                 decoration: BoxDecoration(
-                                                  color: const Color(
-                                                    0xffF6F6F6,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(18),
+                                                  color: const Color(0xffF6F6F6),
+                                                  borderRadius: BorderRadius.circular(18),
                                                 ),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     ClipRRect(
-                                                      borderRadius:
-                                                          const BorderRadius.vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                  18,
-                                                                ),
-                                                          ),
+                                                      borderRadius: const BorderRadius.vertical(
+                                                        top: Radius.circular(18),
+                                                      ),
                                                       child: Container(
                                                         width: 40.w,
                                                         height: 14.h,
                                                         color: Colors.grey[200],
-                                                        child:
-                                                            job
-                                                                .vendorImage
-                                                                .isNotEmpty
+                                                        child: job.vendorImage.isNotEmpty
                                                             ? CachedNetworkImage(
-                                                                imageUrl: job
-                                                                    .vendorImage,
-                                                                width: 40.w,
-                                                                height: 14.h,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              )
+                                                          imageUrl: job.vendorImage,
+                                                          width: 40.w,
+                                                          height: 14.h,
+                                                          fit: BoxFit.cover,
+                                                        )
                                                             : null,
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 6,
-                                                          ),
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 6,
+                                                      ),
                                                       child: Text(
                                                         job.vendorName,
-                                                        style:
-                                                            GoogleFonts.plusJakartaSans(
-                                                              color:
-                                                                  const Color(
-                                                                    0xff1E1E1E,
-                                                                  ),
-                                                              fontSize: 14.5.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
+                                                        style: GoogleFonts.plusJakartaSans(
+                                                          color: const Color(0xff1E1E1E),
+                                                          fontSize: 14.5.sp,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                          ),
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                      ),
                                                       child: Text(
                                                         "${job.title} - ${job.contractType}",
                                                         style: GoogleFonts.plusJakartaSans(
-                                                          color:
-                                                              const Color.fromARGB(
-                                                                110,
-                                                                30,
-                                                                30,
-                                                                30,
-                                                              ),
+                                                          color: const Color.fromARGB(110, 30, 30, 30),
                                                           fontSize: 13.sp,
-                                                          fontWeight:
-                                                              FontWeight.w400,
+                                                          fontWeight: FontWeight.w400,
                                                         ),
                                                       ),
                                                     ),
@@ -386,8 +367,28 @@ class _UserHomePageState extends State<UserHomePage> {
                                   ],
                                 ),
                               );
-                            }).toList(),
-                          ),
+                            }),
+
+                            if (controller.hasMoreJobs)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: controller.isLoadingMore
+                                      ? CircularProgressIndicator()
+                                      : Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Text(
+                                      "Loading more jobs...",
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: const Color(0xff1E1E1E),
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            SizedBox(height: 4.h),
+                          ],
                         ),
                       );
                     },

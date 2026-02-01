@@ -49,16 +49,24 @@ class _VendorHomeState extends State<VendorHome> {
   int currentIndex = 0;
   PageController pageController = PageController();
 
-  List<Map<String, dynamic>> getWeeklyScheduleData() {
-    return [
-      {"day": "Monday", "start": "08:30", "end": "19:00", "isOpen": true},
-      {"day": "Tuesday", "start": "08:30", "end": "19:00", "isOpen": true},
-      {"day": "Wednesday", "start": "08:30", "end": "19:00", "isOpen": true},
-      {"day": "Thursday", "start": "08:30", "end": "19:00", "isOpen": true},
-      {"day": "Friday", "start": "08:30", "end": "19:00", "isOpen": true},
-      {"day": "Saturday", "start": "Closed", "end": "", "isOpen": false},
-      {"day": "Sunday", "start": "Closed", "end": "", "isOpen": false},
+  List<Map<String, dynamic>> getVendorWeeklySchedule() {
+    List<String> dayNames = [
+      "Monday", "Tuesday", "Wednesday", "Thursday",
+      "Friday", "Saturday", "Sunday"
     ];
+
+    List<Map<String, dynamic>> schedule = [];
+
+    for (int i = 0; i < 7; i++) {
+      schedule.add({
+        "day": dayNames[i],
+        "start": currentUser.schedule[i]["start"] ?? "08:30",
+        "end": currentUser.schedule[i]["end"] ?? "19:00",
+        "isOpen": currentUser.schedule[i]["isOpen"] ?? (i < 5),
+      });
+    }
+
+    return schedule;
   }
 
   Widget _buildStatusBadge() {
@@ -88,7 +96,8 @@ class _VendorHomeState extends State<VendorHome> {
   }
 
   Widget buildWeeklySchedule() {
-    final weeklyData = getWeeklyScheduleData();
+    final weeklyData = getVendorWeeklySchedule();
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -176,7 +185,6 @@ class _VendorHomeState extends State<VendorHome> {
                         ),
                       ),
                       SizedBox(width: 3.w),
-                      // Line 69 ke paas UPDATE:
                       onPress(
                         ontap: () {
                           Get.find<NavControllerD1>().selectedIndex = 3;

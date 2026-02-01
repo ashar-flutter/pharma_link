@@ -21,9 +21,18 @@ class JobController extends GetxController {
   String? contractType;
   DateTime? selectedDate;
 
+  // ===================== PAGINATION VARIABLES =====================
+  int _currentPage = 0;
+  final int _pageSize = 10;
+  bool _hasMoreJobs = true;
+  bool _isLoadingMore = false;
+
   // ===================== CRITICAL FIX: SEPARATE DATA STORAGE =====================
   List<JobModel> _allUserJobs = [];
   List<JobModel> _allVendorJobs = [];
+
+
+  int get currentPage => _currentPage;
 
   // Vendor cache
   Map<String, UserModel> vendorCache = {};
@@ -42,11 +51,11 @@ class JobController extends GetxController {
 
   // ===================== PRIVATE FUNCTION: USER TYPE CHECK =====================
   void _loadDataBasedOnUserType() {
-    if (currentUser.userType == 1) { // USER
+    if (currentUser.userType == 1) {
       loadJobs();
       loadSavedJobs();
       loadAppliedJobs();
-    } else if (currentUser.userType == 2) { // VENDOR
+    } else if (currentUser.userType == 2) {
       loadVendorJobs();
     }
   }
@@ -138,7 +147,6 @@ class JobController extends GetxController {
     }
   }
 
-  // ===================== USER SIDE - WITHDRAWAL =====================
   Future<void> withdrawApplication(String applicationId, String jobId) async {
     EasyLoading.show(status: "Withdrawing...");
 
@@ -152,7 +160,6 @@ class JobController extends GetxController {
       if (success) {
         await loadAppliedJobs();
         EasyLoading.showSuccess("Application withdrawn!");
-
         if (Get.isDialogOpen ?? false) Get.back();
         if (Navigator.canPop(Get.context!)) Get.back();
       } else {
@@ -164,6 +171,85 @@ class JobController extends GetxController {
   }
 
   // ===================== USER SIDE - JOB DISPLAY =====================
+  Future<void> loadJobs() async {
+    if (currentUser.userType != 1) return;
+
+    try {
+      _allUserJobs = await FirestoreServices.I.getJobsByCountry(
+        country: currentUser.country,
+        limit: _pageSize,
+      );
+
+      _hasMoreJobs = _allUserJobs.length >= _pageSize;
+      update();
+    } catch (e) {
+      _allUserJobs = [];
+      update();
+    }
+  }
+
+  Future<void> loadMoreJobs() async {
+    if (_isLoadingMore || !_hasMoreJobs || currentUser.userType != 1) return;
+
+    _isLoadingMore = true;
+    update();
+
+    try {
+      _currentPage++;
+
+      List<JobModel> moreJobs = await FirestoreServices.I.getJobsByCountry(
+        country: currentUser.country,
+        limit: _pageSize,
+        lastDocument: _allUserJobs.isNotEmpty ? _allUserJobs.last : null,
+      );
+
+      if (moreJobs.isEmpty) {
+        _hasMoreJobs = false;
+      } else {
+        _allUserJobs.addAll(moreJobs);
+      }
+
+      update();
+    } catch (e) {
+      // Handle error
+    }
+
+    _isLoadingMore = false;
+    update();
+  }
+
+  void resetPagination() {
+    _currentPage = 0;
+    _hasMoreJobs = true;
+    _allUserJobs.clear();
+    update();
+  }
+
+
+
+  Map<String, List<JobModel>> getJobsGroupedByCity() {
+    Map<String, List<JobModel>> groupedJobs = {};
+
+    // Filter by country first
+    List<JobModel> countryJobs = _allUserJobs
+        .where(
+          (job) => job.isActive && job.vendorCountry == currentUser.country,
+        )
+        .toList();
+
+    // Group by city
+    for (var job in countryJobs) {
+      String cityKey = job.vendorCity;
+
+      if (!groupedJobs.containsKey(cityKey)) {
+        groupedJobs[cityKey] = [];
+      }
+      groupedJobs[cityKey]!.add(job);
+    }
+
+    return groupedJobs;
+  }
+
   Map<String, List<JobModel>> getJobsGroupedByAddress() {
     Map<String, List<JobModel>> groupedJobs = {};
     String userCity = currentUser.city;
@@ -184,6 +270,35 @@ class JobController extends GetxController {
     }
 
     return groupedJobs;
+  }
+
+  List<String> getCitiesWithJobs() {
+    Set<String> cities = {};
+
+    List<JobModel> countryJobs = _allUserJobs
+        .where(
+          (job) => job.isActive && job.vendorCountry == currentUser.country,
+        )
+        .toList();
+
+    for (var job in countryJobs) {
+      if (job.vendorCity.isNotEmpty) {
+        cities.add(job.vendorCity);
+      }
+    }
+
+    return cities.toList();
+  }
+
+  List<JobModel> getJobsByCity(String city) {
+    return _allUserJobs
+        .where(
+          (job) =>
+              job.isActive &&
+              job.vendorCountry == currentUser.country &&
+              job.vendorCity == city,
+        )
+        .toList();
   }
 
   // ===================== SAVED JOBS FUNCTIONS =====================
@@ -296,11 +411,9 @@ class JobController extends GetxController {
 
     try {
       await FirestoreServices.I.addJob(newJob);
-
       if (currentUser.userType == 2) {
         await loadVendorJobs();
       }
-
       clearFields();
       EasyLoading.showSuccess(
         isActive ? "Job published" : "Job saved as draft",
@@ -316,11 +429,9 @@ class JobController extends GetxController {
 
     try {
       _allVendorJobs = await FirestoreServices.I.getVendorJobs(currentUser.id);
-
-      _allVendorJobs = _allVendorJobs.where((job) =>
-      job.vendorId == currentUser.id
-      ).toList();
-
+      _allVendorJobs = _allVendorJobs
+          .where((job) => job.vendorId == currentUser.id)
+          .toList();
       update();
     } catch (e) {
       _allVendorJobs = [];
@@ -328,6 +439,7 @@ class JobController extends GetxController {
     }
   }
 
+  // ===================== GETTERS =====================
   List<JobModel> get allJobs {
     if (currentUser.userType == 1) {
       return _allUserJobs;
@@ -352,6 +464,7 @@ class JobController extends GetxController {
     }
   }
 
+  // ===================== VENDOR SPECIFIC FUNCTIONS =====================
   List<JobModel> getJobsForVendor(String vendorId) {
     if (currentUser.userType == 2) {
       return _allVendorJobs
@@ -370,28 +483,14 @@ class JobController extends GetxController {
     return vendorJobs
         .where(
           (job) => job.contractType.toLowerCase().contains(type.toLowerCase()),
-    )
+        )
         .toList();
   }
 
+  bool get hasMoreJobs => _hasMoreJobs;
+  bool get isLoadingMore => _isLoadingMore;
+
   // ===================== COMMON FUNCTIONS =====================
-  Future<void> loadJobs() async {
-    if (currentUser.userType != 1) return;
-
-    try {
-      _allUserJobs = await FirestoreServices.I.getAllActiveJobs();
-
-      _allUserJobs = _allUserJobs.where((job) =>
-      job.isActive && job.vendorCity == currentUser.city
-      ).toList();
-
-      update();
-    } catch (e) {
-      _allUserJobs = [];
-      update();
-    }
-  }
-
   Future<UserModel> getVendorData(String vendorId) async {
     if (vendorCache.containsKey(vendorId)) return vendorCache[vendorId]!;
     UserModel vendor = await FirestoreServices.I.getUser(vendorId);
@@ -410,8 +509,9 @@ class JobController extends GetxController {
 
   bool hasJobsInUserCity() {
     if (currentUser.userType != 1) return false;
-
     String userCity = currentUser.city;
-    return _allUserJobs.any((job) => job.isActive && job.vendorCity == userCity);
+    return _allUserJobs.any(
+      (job) => job.isActive && job.vendorCity == userCity,
+    );
   }
 }
