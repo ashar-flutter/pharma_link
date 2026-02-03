@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:linkpharma/page/auth/splash_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import 'controller/chat_controller.dart';
 import 'controller/job_controller.dart';
 import 'firebase_options.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(JobController());
+    Get.put(ChatController());
     return ResponsiveSizer(
       builder: (BuildContext context, orientation, screenType) {
         return GetMaterialApp(

@@ -206,6 +206,11 @@ class _UserHomePageState extends State<UserHomePage> {
                   ),
                   child: GetBuilder<JobController>(
                     builder: (controller) {
+                      if (controller.allJobs.isEmpty) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
                       List<String> cities = controller.getCitiesWithJobs();
 
                       if (cities.isEmpty && !controller.isLoadingMore) {
@@ -214,7 +219,7 @@ class _UserHomePageState extends State<UserHomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "No jobs available in ${currentUser.country}",
+                                "No jobs available at the moment",
                                 style: GoogleFonts.plusJakartaSans(
                                   color: const Color(0xff1E1E1E),
                                   fontSize: 16.sp,
@@ -235,7 +240,7 @@ class _UserHomePageState extends State<UserHomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
 
-                            SizedBox(height: 1.h),
+                            SizedBox(height: 4.h),
                             ...cities.map((city) {
                               List<JobModel> cityJobs = controller.getJobsByCity(city);
 
@@ -287,7 +292,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 1.h),
+                                    SizedBox(height: 2.h),
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(

@@ -36,7 +36,6 @@ class FirestoreServices {
 
   Future<void> addUser(UserModel user) async {
     try {
-      // COUNTRY TRIM: Save karte time trim karo
       user.country = user.country.trim();
 
       await _instance.collection("users").doc(user.id).set(user.toJson());
@@ -157,15 +156,19 @@ class FirestoreServices {
         'updatedAt': DateTime.now().toIso8601String(),
       };
 
-      if (withdrawnAt != null)
+      if (withdrawnAt != null) {
         updateData['withdrawnAt'] = withdrawnAt.toIso8601String();
-      if (rejectedAt != null)
+      }
+      if (rejectedAt != null) {
         updateData['rejectedAt'] = rejectedAt.toIso8601String();
-      if (acceptedAt != null)
+      }
+      if (acceptedAt != null) {
         updateData['acceptedAt'] = acceptedAt.toIso8601String();
-      if (interviewScheduledAt != null)
+      }
+      if (interviewScheduledAt != null) {
         updateData['interviewScheduledAt'] = interviewScheduledAt
             .toIso8601String();
+      }
 
       await _instance
           .collection('jobApplications')
@@ -181,7 +184,6 @@ class FirestoreServices {
   // ===================== VENDOR - JOB MANAGEMENT =====================
   Future<void> addJob(JobModel job) async {
     try {
-      // JOB COUNTRY TRIM: Save karte time trim karo
       job.vendorCountry = job.vendorCountry.trim();
 
       await _instance.collection('jobs').doc(job.id).set(job.toJson());
@@ -545,4 +547,72 @@ class FirestoreServices {
       return false;
     }
   }
+
+
+
+
+// ===================== VENDOR JOB FUNCTIONS =====================
+
+  /// Get job by ID
+  Future<JobModel?> getVendorJobById(String jobId) async {
+    try {
+      final doc = await _instance.collection('jobs').doc(jobId).get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null) {
+          final jobData = Map<String, dynamic>.from(data);
+          jobData['id'] = doc.id;
+          return JobModel.fromJson(jobData);
+        }
+      }
+      return null;
+    } catch (e) {
+      logger.e("Error getting vendor job: $e");
+      return null;
+    }
+  }
+
+  /// Get applications for specific job
+  Future<List<Map<String, dynamic>>> getVendorJobApplications(String jobId) async {
+    try {
+      final snapshot = await _instance
+          .collection('jobApplications')
+          .where('jobId', isEqualTo: jobId)
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      List<Map<String, dynamic>> applications = [];
+
+      for (var doc in snapshot.docs) {
+        final appData = doc.data();
+        final user = await getUser(appData['userId']);
+
+        applications.add({
+          'id': doc.id,
+          'appData': appData,
+          'user': user,
+        });
+      }
+
+      return applications;
+    } catch (e) {
+      logger.e("Error getting vendor applications: $e");
+      return [];
+    }
+  }
+
+  /// Update job status
+  Future<bool> updateVendorJobStatus(String jobId, bool isActive) async {
+    try {
+      await _instance
+          .collection('jobs')
+          .doc(jobId)
+          .update({'isActive': isActive});
+      return true;
+    } catch (e) {
+      logger.e("Error updating job status: $e");
+      return false;
+    }
+  }
+
 }

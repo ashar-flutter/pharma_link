@@ -43,7 +43,7 @@ dependencies:
   croppy: ^1.4.1
   image: ^4.7.2
   file_picker: ^10.3.8
-
+  flutter_secure_storage:
 dev_dependencies:
   flutter_test:
     sdk: flutter

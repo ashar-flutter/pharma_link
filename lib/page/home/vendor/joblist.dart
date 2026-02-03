@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/home/notification.dart';
 import 'package:linkpharma/page/home/vendor/add-new_job.dart';
-import 'package:linkpharma/page/home/vendor/jobsdetail.dart';
 import 'package:linkpharma/page/home/vendor/vendor_drawer.dart';
 import 'package:linkpharma/widgets/ontap.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
@@ -12,6 +11,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../config/global.dart';
 import '../../../controller/job_controller.dart';
 import '../../../models/job_model.dart';
+import 'jobsdetail.dart';
 
 class VendorJobLists extends StatefulWidget {
   const VendorJobLists({super.key});
@@ -259,7 +259,8 @@ class JobCard extends StatelessWidget {
 
     return onPress(
       ontap: () {
-        Get.to(VendorJobsDetailPage());
+        Get.find<JobController>().clearVendorData();
+        Get.to(() => VendorJobsDetailPage(jobId: job.id));
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 3.h),

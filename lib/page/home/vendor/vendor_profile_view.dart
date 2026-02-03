@@ -1,60 +1,33 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/controller/job_controller.dart';
 import 'package:linkpharma/page/home/chat/chat_page.dart';
 import 'package:linkpharma/widgets/custom_button.dart';
 import 'package:linkpharma/widgets/ontap.dart';
-import 'package:linkpharma/widgets/txt_field.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../models/user_model.dart';
+
 class VendorProfileView extends StatefulWidget {
-  const VendorProfileView({super.key});
+  final UserModel user;
+
+  const VendorProfileView({super.key, required this.user});
 
   @override
-  State<VendorProfileView> createState() => VendorProfileViewState();
+  State<VendorProfileView> createState() => _VendorProfileViewState();
 }
 
-class VendorProfileViewState extends State<VendorProfileView> {
-  String? selectedCountry;
-
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xff10B66D),
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Color(0xff10B66D)),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedDate != null) {
-      debugPrint("Selected Date: $pickedDate");
-    }
-  }
+class _VendorProfileViewState extends State<VendorProfileView> {
+  final JobController _controller = Get.find<JobController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.primary,
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
       body: Column(
         children: [
           SafeArea(
@@ -109,16 +82,19 @@ class VendorProfileViewState extends State<VendorProfileView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Image.asset(
-                          "assets/images/as9.png",
-                          height: 17.h,
+                        child: CircleAvatar(
+                          radius: 8.5.h,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: widget.user.image.isNotEmpty
+                              ? CachedNetworkImageProvider(widget.user.image)
+                              : null,
                         ),
                       ),
                       SizedBox(height: 2.h),
 
                       Center(
                         child: text_widget(
-                          "William Jack",
+                          "${widget.user.firstName} ${widget.user.lastName}",
                           color: Colors.black,
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
@@ -127,7 +103,7 @@ class VendorProfileViewState extends State<VendorProfileView> {
                       SizedBox(height: 0.3.h),
                       Center(
                         child: text_widget(
-                          "williamjack123@gmail.com",
+                          widget.user.email,
                           fontSize: 14.sp,
                           color: Color(0xff1E1E1E).withOpacity(0.40),
                         ),
@@ -146,7 +122,9 @@ class VendorProfileViewState extends State<VendorProfileView> {
                                 child: Column(
                                   children: [
                                     text_widget(
-                                      "Pharmacist",
+                                      widget.user.role.isNotEmpty
+                                          ? widget.user.role
+                                          : "Not specified",
                                       fontSize: 15.sp,
                                       color: MyColors.primary,
                                     ),
@@ -176,7 +154,9 @@ class VendorProfileViewState extends State<VendorProfileView> {
                                 child: Column(
                                   children: [
                                     text_widget(
-                                      "2 Years",
+                                      widget.user.experience.isNotEmpty
+                                          ? "${widget.user.experience} Years"
+                                          : "Not specified",
                                       fontSize: 15.sp,
                                       color: MyColors.primary,
                                     ),
@@ -205,7 +185,9 @@ class VendorProfileViewState extends State<VendorProfileView> {
                                 child: Column(
                                   children: [
                                     text_widget(
-                                      "New York",
+                                      widget.user.city.isNotEmpty
+                                          ? widget.user.city
+                                          : "Not specified",
                                       fontSize: 15.sp,
                                       color: MyColors.primary,
                                     ),
@@ -225,17 +207,20 @@ class VendorProfileViewState extends State<VendorProfileView> {
                         ],
                       ),
                       SizedBox(height: 3.h),
-                      text_widget(
-                        "We are looking for a dynamic pharmacist with skills in the dermocostetic and vaccination .We are looking for the dynamic pharmacist with skills in dermocostetic and vaccination . We are looking for a dynamic pharmacist with skills in the dermocostetic and vaccination .We are looking for the dynamic pharmacist with skills in dermocostetic and vaccination .  We are looking for a dynamic pharmacist with skills in the dermocostetic and vaccination .We are looking for the dynamic pharmacist with skills in dermocostetic and vaccination . We are looking for a dynamic pharmacist with skills in the dermocostetic and vaccination .We are looking for the dynamic pharmacist with skills in dermocostetic and vaccination . ",
+                      widget.user.description.isNotEmpty
+                          ? text_widget(
+                        widget.user.description,
                         fontSize: 13.4.sp,
                         color: Color(0xff1E1E1E).withOpacity(0.40),
-                      ),
+                      )
+                          : SizedBox(),
                       SizedBox(height: 6.h),
                       gradientButton(
                         "Download CV",
                         width: Get.width,
-                        ontap: () async {},
-
+                        ontap: () async {
+                          _controller.openVendorCV(widget.user.cv);
+                        },
                         height: 5.5,
                         isColor: false,
                         txtColor: MyColors.primary,
@@ -247,7 +232,14 @@ class VendorProfileViewState extends State<VendorProfileView> {
                         "Message",
                         width: Get.width,
                         ontap: () async {
-                          Get.to(ChatScreenView(isBot: false));
+                          Get.to(() => ChatScreenView(
+                            receiverId: widget.user.id,
+                            receiverName: "${widget.user.firstName} ${widget.user.lastName}",
+                            receiverImage: widget.user.image,
+                            receiverRole: widget.user.role.isNotEmpty
+                                ? widget.user.role
+                                : "Pharmacist",
+                          ));
                         },
                         height: 5.5,
                         isColor: true,

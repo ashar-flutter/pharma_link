@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/models/job_model.dart';
 import 'package:linkpharma/services/firestore_services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/user_model.dart';
 import '../page/home/jobs_aplied.dart';
@@ -30,7 +31,6 @@ class JobController extends GetxController {
   // ===================== CRITICAL FIX: SEPARATE DATA STORAGE =====================
   List<JobModel> _allUserJobs = [];
   List<JobModel> _allVendorJobs = [];
-
 
   int get currentPage => _currentPage;
 
@@ -225,8 +225,6 @@ class JobController extends GetxController {
     update();
   }
 
-
-
   Map<String, List<JobModel>> getJobsGroupedByCity() {
     Map<String, List<JobModel>> groupedJobs = {};
 
@@ -234,7 +232,7 @@ class JobController extends GetxController {
     List<JobModel> countryJobs = _allUserJobs
         .where(
           (job) => job.isActive && job.vendorCountry == currentUser.country,
-        )
+    )
         .toList();
 
     // Group by city
@@ -278,7 +276,7 @@ class JobController extends GetxController {
     List<JobModel> countryJobs = _allUserJobs
         .where(
           (job) => job.isActive && job.vendorCountry == currentUser.country,
-        )
+    )
         .toList();
 
     for (var job in countryJobs) {
@@ -294,10 +292,10 @@ class JobController extends GetxController {
     return _allUserJobs
         .where(
           (job) =>
-              job.isActive &&
-              job.vendorCountry == currentUser.country &&
-              job.vendorCity == city,
-        )
+      job.isActive &&
+          job.vendorCountry == currentUser.country &&
+          job.vendorCity == city,
+    )
         .toList();
   }
 
@@ -393,7 +391,10 @@ class JobController extends GetxController {
     EasyLoading.show(status: "Saving job...");
 
     JobModel newJob = JobModel()
-      ..id = DateTime.now().millisecondsSinceEpoch.toString()
+      ..id = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString()
       ..vendorId = currentUser.id
       ..vendorName = currentUser.firstName
       ..vendorImage = currentUser.images.isNotEmpty ? currentUser.images[0] : ""
@@ -483,11 +484,12 @@ class JobController extends GetxController {
     return vendorJobs
         .where(
           (job) => job.contractType.toLowerCase().contains(type.toLowerCase()),
-        )
+    )
         .toList();
   }
 
   bool get hasMoreJobs => _hasMoreJobs;
+
   bool get isLoadingMore => _isLoadingMore;
 
   // ===================== COMMON FUNCTIONS =====================
@@ -511,7 +513,102 @@ class JobController extends GetxController {
     if (currentUser.userType != 1) return false;
     String userCity = currentUser.city;
     return _allUserJobs.any(
-      (job) => job.isActive && job.vendorCity == userCity,
+          (job) => job.isActive && job.vendorCity == userCity,
     );
+  }
+
+  // ===================== VENDOR JOB VARIABLES =====================
+  JobModel? vendorJob;
+  List<Map<String, dynamic>> vendorApplications = [];
+  TextEditingController vendorSearchController = TextEditingController();
+
+  // ===================== LOAD VENDOR JOB =====================
+  Future<void> loadVendorJob(String jobId) async {
+    try {
+      // Load job
+      vendorJob = await FirestoreServices.I.getVendorJobById(jobId);
+
+      // Load applications
+      vendorApplications = await FirestoreServices.I.getVendorJobApplications(
+        jobId,
+      );
+
+      update();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error loading vendor job: $e");
+      }
+    }
+  }
+
+  // ===================== TOGGLE JOB STATUS =====================
+  Future<void> toggleVendorJob() async {
+    if (vendorJob == null) return;
+
+    try {
+      EasyLoading.show(status: 'Updating...');
+
+      bool newStatus = !vendorJob!.isActive;
+      bool success = await FirestoreServices.I.updateVendorJobStatus(
+        vendorJob!.id,
+        newStatus,
+      );
+
+      if (success) {
+        vendorJob!.isActive = newStatus;
+        await loadVendorJobs(); // Refresh list
+        EasyLoading.showSuccess(
+          newStatus ? 'Job activated' : 'Job deactivated',
+        );
+        update();
+      }
+    } catch (e) {
+      EasyLoading.showError('Error: $e');
+    }
+  }
+
+  // ===================== OPEN CV =====================
+  Future<void> openVendorCV(String cvUrl) async {
+    if (cvUrl.isEmpty) {
+      EasyLoading.showInfo("CV not available");
+      return;
+    }
+
+    try {
+      Uri url = Uri.parse(cvUrl);
+
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        EasyLoading.showError("Cannot open CV");
+      }
+    } catch (e) {
+      EasyLoading.showError("Failed to open CV");
+    }
+  }
+
+  // ===================== SEARCH CANDIDATES =====================
+  List<Map<String, dynamic>> searchVendorCandidates(String query) {
+    if (query.isEmpty) return vendorApplications;
+
+    String lowerQuery = query.toLowerCase();
+
+    return vendorApplications.where((app) {
+      UserModel user = app['user'];
+      Map<String, dynamic> data = app['appData'];
+
+      String name = "${user.firstName} ${user.lastName}".toLowerCase();
+      String message = (data['message'] ?? "").toString().toLowerCase();
+
+      return name.contains(lowerQuery) || message.contains(lowerQuery);
+    }).toList();
+  }
+
+  // ===================== CLEAR DATA =====================
+  void clearVendorData() {
+    vendorJob = null;
+    vendorApplications.clear();
+    vendorSearchController.clear();
+    update();
   }
 }
