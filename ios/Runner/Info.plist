@@ -65,6 +65,11 @@
 		<string>This app requires to access your photo library to show image on profile and send via chat</string>
 		<key>NSRemindersUsageDescription</key>
 		<string>This app requires to access your reminders to show reminders</string>
+
+		<!-- Google Maps API Key Placeholder -->
+		<key>GMSApiKey</key>
+		<string>AIzaSyAQRNhGuJwm3n061kFwb_mJ3Kc0OUlslFM</string>
+
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
@@ -77,7 +82,7 @@
 				</array>
 			</dict>
 		</array>
-		<!-- Other configurations -->
+
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<string>fb</string>
@@ -90,6 +95,7 @@
 			<string>googlechrome</string>
 			<string>googleusercontent</string>
 		</array>
+
 		<!-- Facebook Configuration -->
 		<key>FacebookAppID</key>
 		<string>3231595837017226</string>
@@ -97,6 +103,7 @@
 		<string>3cd49560dfa9a7dad35e03dc28c5a8ac</string>
 		<key>FacebookDisplayName</key>
 		<string>Linkpharma</string>
+
 		<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>

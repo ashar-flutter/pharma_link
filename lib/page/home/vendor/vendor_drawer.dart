@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
+import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/page/auth/select_role_page.dart';
 import 'package:linkpharma/page/home/contact.dart';
 import 'package:linkpharma/page/home/notification.dart';
@@ -14,16 +15,14 @@ import 'package:linkpharma/page/home/vendor/vendor_nav.dart';
 import 'package:linkpharma/services/auth_services.dart';
 import 'package:linkpharma/widgets/showPopup.dart';
 import 'package:linkpharma/widgets/txt_widget.dart';
-
 import 'package:remixicon/remixicon.dart';
-
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-List<String> titles = ["Home", "Notifications", "Privacy Policy", "Contact Us"];
+import '../../../controller/auth_controller.dart';
 
+List<String> titles = ["Home", "Notifications", "Privacy Policy", "Contact Us"];
 List images = [
   "assets/icons/d1.png",
-
   "assets/icons/d3.png",
   "assets/icons/d4.png",
   "assets/icons/d5.png",
@@ -73,13 +72,11 @@ class _VendorDrawerState extends State<VendorDrawer> {
                           },
                         ),
                         borderRadius: 30,
-
                         showShadow: true,
                         angle: -3,
                         slideWidth: 220,
                         shadowLayer1Color: Colors.transparent,
                         shadowLayer2Color: Colors.grey.shade100,
-
                         menuBackgroundColor: Colors.transparent,
                       ),
                       con.open
@@ -124,7 +121,6 @@ class _VendorDrawerState extends State<VendorDrawer> {
                                           ),
                                         ),
                                         SizedBox(height: 1.h),
-
                                         SizedBox(height: 3.h),
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -136,15 +132,125 @@ class _VendorDrawerState extends State<VendorDrawer> {
                                             children: [
                                               Stack(
                                                 children: [
-                                                  CircleAvatar(
-                                                    radius: 35,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    child: Icon(
-                                                      Remix.user_2_line,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
+                                                  (currentUser.userType == 2 &&
+                                                          currentUser
+                                                              .owners
+                                                              .isNotEmpty &&
+                                                          currentUser
+                                                                  .owners[0]['image'] !=
+                                                              null &&
+                                                          currentUser
+                                                              .owners[0]['image']
+                                                              .toString()
+                                                              .isNotEmpty)
+                                                      ? ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                35,
+                                                              ),
+                                                          child: CachedNetworkImage(
+                                                            imageUrl: currentUser
+                                                                .owners[0]['image']
+                                                                .toString(),
+                                                            width: 70,
+                                                            height: 70,
+                                                            fit: BoxFit.cover,
+                                                            placeholder:
+                                                                (
+                                                                  context,
+                                                                  url,
+                                                                ) => Container(
+                                                                  width: 70,
+                                                                  height: 70,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          35,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                            errorWidget:
+                                                                (
+                                                                  context,
+                                                                  url,
+                                                                  error,
+                                                                ) => Container(
+                                                                  width: 70,
+                                                                  height: 70,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          35,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                          ),
+                                                        )
+                                                      : currentUser
+                                                            .image
+                                                            .isNotEmpty
+                                                      ? ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                35,
+                                                              ),
+                                                          child: CachedNetworkImage(
+                                                            imageUrl:
+                                                                currentUser
+                                                                    .image,
+                                                            width: 70,
+                                                            height: 70,
+                                                            fit: BoxFit.cover,
+                                                            placeholder:
+                                                                (
+                                                                  context,
+                                                                  url,
+                                                                ) => Container(
+                                                                  width: 70,
+                                                                  height: 70,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          35,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                            errorWidget:
+                                                                (
+                                                                  context,
+                                                                  url,
+                                                                  error,
+                                                                ) => Container(
+                                                                  width: 70,
+                                                                  height: 70,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          35,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                          ),
+                                                        )
+                                                      : Container(
+                                                          width: 70,
+                                                          height: 70,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  35,
+                                                                ),
+                                                          ),
+                                                        ),
                                                 ],
                                               ),
                                               SizedBox(height: 2.h),
@@ -155,7 +261,14 @@ class _VendorDrawerState extends State<VendorDrawer> {
                                               ),
                                               SizedBox(height: 1.h),
                                               text_widget(
-                                                "John Doe".tr,
+                                                (currentUser.userType == 2 &&
+                                                        currentUser
+                                                            .owners
+                                                            .isNotEmpty)
+                                                    ? "${currentUser.owners[0]['name']} ${currentUser.owners[0]['sureName']}"
+                                                          .trim()
+                                                    : "${currentUser.firstName} ${currentUser.lastName}"
+                                                          .trim(),
                                                 color: MyColors.white,
                                                 fontWeight: FontWeight.w400,
                                               ),
@@ -182,18 +295,16 @@ class _VendorDrawerState extends State<VendorDrawer> {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            Get.find<VendorDrawerController>()
-                                                .closeDrawer();
+                                            Get.find<VendorDrawerController>().closeDrawer();
                                             showPopup(
                                               context,
                                               "Logout",
                                               "Are you sure you want to logout?",
                                               "Cancel",
                                               "Logout",
-                                              () => Get.back(),
-                                              () async {
-                                                await AuthServices.I.logOut();
-                                                Get.offAll(SelectRolePage());
+                                                  () => Get.back(),
+                                                  () async {
+                                                Get.find<AuthController>().signOut(context);
                                               },
                                             );
                                           },
@@ -207,11 +318,8 @@ class _VendorDrawerState extends State<VendorDrawer> {
                                               border: Border.all(
                                                 color: Colors.white,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(80),
-                                              color: MyColors.white.withOpacity(
-                                                0.30,
-                                              ),
+                                              borderRadius: BorderRadius.circular(80),
+                                              color: MyColors.white.withOpacity(0.30),
                                             ),
                                             child: text_widget(
                                               "Sign Out".tr,
@@ -278,7 +386,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                     if (index == 0) {
                                       con.closeDrawer();
                                     }
-
                                     if (index == 1) {
                                       Get.to(NotificationPage());
                                       con.closeDrawer();
@@ -287,12 +394,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                       Get.to(PrivacyPage());
                                       con.closeDrawer();
                                     }
-
                                     if (index == 3) {
                                       Get.to(ContactPage());
                                       con.closeDrawer();
                                     }
-
                                     setState(() {});
                                   },
                                   child: Padding(
@@ -318,9 +423,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                                 ? MyColors.primary
                                                 : Colors.white,
                                           ),
-
                                           SizedBox(width: 3.w),
-
                                           Text(
                                             titles[index].tr,
                                             style: GoogleFonts.plusJakartaSans(
@@ -364,7 +467,6 @@ class VendorDrawerController extends GetxController {
     print("Toggle drawer");
     Timer(const Duration(microseconds: 30), () {
       open = true;
-
       update();
     });
     zoomDrawerController.toggle?.call();
@@ -377,7 +479,6 @@ class VendorDrawerController extends GetxController {
     print("Close drawer");
     Timer(const Duration(microseconds: 800), () {
       open = false;
-
       update();
     });
     zoomDrawerController.close?.call();

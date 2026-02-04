@@ -9,7 +9,10 @@ import 'package:linkpharma/services/firestorage_services.dart';
 import 'package:linkpharma/services/firestore_services.dart';
 import 'package:linkpharma/services/loadingService.dart';
 
+import '../models/user_model.dart';
+
 class UserProfileController extends GetxController {
+  // users
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -17,6 +20,13 @@ class UserProfileController extends GetxController {
   TextEditingController experienceController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
+  // vendor
+  TextEditingController vendorFirstNameController = TextEditingController();
+  TextEditingController vendorLastNameController = TextEditingController();
+  TextEditingController vendorEmailController = TextEditingController();
+  TextEditingController vendorCityController = TextEditingController();
+
+  // COMMON VARIABLES
   String? selectedCountry;
   File? profileImage;
   File? cvFile;
@@ -28,27 +38,38 @@ class UserProfileController extends GetxController {
   }
 
   void _loadCurrentUserData() {
-    firstNameController.text = currentUser.firstName;
-    lastNameController.text = currentUser.lastName;
-    emailController.text = currentUser.email;
-    cityController.text = currentUser.city;
-    experienceController.text = currentUser.experience;
-    descriptionController.text = currentUser.description;
+    if (currentUser.userType == 1) {
+      firstNameController.text = currentUser.firstName;
+      lastNameController.text = currentUser.lastName;
+      emailController.text = currentUser.email;
+      cityController.text = currentUser.city;
+      experienceController.text = currentUser.experience;
+      descriptionController.text = currentUser.description;
 
-    final List<String> availableRoles = [
-      "Part Time",
-      "Full Time",
-      "Replacement",
-      "Internship",
-      "Owner",
-      "Doctor",
-      "Pharmacist"
-    ];
+      final List<String> availableRoles = [
+        "Part Time",
+        "Full Time",
+        "Replacement",
+        "Internship",
+        "Owner",
+        "Doctor",
+        "Pharmacist",
+      ];
 
-    if (availableRoles.contains(currentUser.role)) {
-      selectedCountry = currentUser.role;
-    } else {
-      selectedCountry = "Part Time";
+      if (availableRoles.contains(currentUser.role)) {
+        selectedCountry = currentUser.role;
+      } else {
+        selectedCountry = "Part Time";
+      }
+    } else if (currentUser.userType == 2) {
+      if (currentUser.owners.isNotEmpty) {
+        vendorFirstNameController.text =
+            currentUser.owners[0]['name']?.toString() ?? "";
+        vendorLastNameController.text =
+            currentUser.owners[0]['sureName']?.toString() ?? "";
+      }
+      vendorEmailController.text = currentUser.email;
+      vendorCityController.text = currentUser.city;
     }
   }
 
@@ -76,7 +97,9 @@ class UserProfileController extends GetxController {
 
       await Clipboard.setData(ClipboardData(text: currentUser.cv));
 
-      EasyLoading.showSuccess("CV link copied to clipboard!\nPaste in browser to download.");
+      EasyLoading.showSuccess(
+        "CV link copied to clipboard!\nPaste in browser to download.",
+      );
 
       Get.defaultDialog(
         title: "CV Download",
@@ -92,19 +115,15 @@ class UserProfileController extends GetxController {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text("OK"),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Get.back(), child: Text("OK"))],
       );
-
     } catch (e) {
       EasyLoading.showError("Failed to copy CV link");
       EasyLoading.dismiss();
     }
   }
+
+  // USER PROFILE UPDATE FUNCTION
   Future<void> updateProfile(BuildContext context) async {
     if (firstNameController.text.isEmpty) {
       EasyLoading.showInfo("Please enter first name");
@@ -145,10 +164,7 @@ class UserProfileController extends GetxController {
     }
 
     if (cvFile != null) {
-      currentUser.cv = await FirestorageServices.I.uploadFile(
-        cvFile!,
-        "cvs",
-      );
+      currentUser.cv = await FirestorageServices.I.uploadFile(cvFile!, "cvs");
     }
 
     currentUser.firstName = firstNameController.text;
@@ -166,6 +182,63 @@ class UserProfileController extends GetxController {
     Get.back();
   }
 
+  // VENDOR PROFILE UPDATE FUNCTION
+  Future<void> updateVendorProfile(BuildContext context) async {
+    if (vendorFirstNameController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter first name");
+      return;
+    }
+    if (vendorLastNameController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter last name");
+      return;
+    }
+    if (!vendorEmailController.text.isEmail) {
+      EasyLoading.showInfo("Please enter valid email");
+      return;
+    }
+    if (vendorCityController.text.isEmpty) {
+      EasyLoading.showInfo("Please enter city");
+      return;
+    }
+
+    LoadingService.I.show(context);
+
+    String? uploadedImageUrl;
+    if (profileImage != null) {
+      uploadedImageUrl = await FirestorageServices.I.uploadImage(
+        profileImage!,
+        "owners",
+      );
+    }
+
+    currentUser.email = vendorEmailController.text;
+    currentUser.city = vendorCityController.text;
+
+    if (currentUser.owners.isNotEmpty) {
+      currentUser.owners[0]['name'] = vendorFirstNameController.text;
+      currentUser.owners[0]['sureName'] = vendorLastNameController.text;
+      if (uploadedImageUrl != null) {
+        currentUser.owners[0]['image'] = uploadedImageUrl;
+      }
+    } else {
+      currentUser.owners.add({
+        'name': vendorFirstNameController.text,
+        'sureName': vendorLastNameController.text,
+        'image': uploadedImageUrl ?? "",
+      });
+    }
+
+    await FirestoreServices.I.addUser(currentUser);
+    UserModel refreshedUser = await FirestoreServices.I.getUser(currentUser.id);
+    currentUser = refreshedUser;
+
+    LoadingService.I.dismiss();
+    EasyLoading.showSuccess("Profile updated successfully!");
+    update();
+    Get.back();
+    Get.find<UserProfileController>().update();
+  }
+
   @override
   void onClose() {
     firstNameController.dispose();
@@ -174,6 +247,12 @@ class UserProfileController extends GetxController {
     cityController.dispose();
     experienceController.dispose();
     descriptionController.dispose();
+
+    vendorFirstNameController.dispose();
+    vendorLastNameController.dispose();
+    vendorEmailController.dispose();
+    vendorCityController.dispose();
+
     super.onClose();
   }
 }

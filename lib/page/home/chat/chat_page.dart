@@ -32,10 +32,10 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   final ScrollController scrollController = ScrollController();
   final TextEditingController msgController = TextEditingController();
 
+
   @override
   void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    super.initState();WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.openChat(
         widget.receiverId,
         widget.receiverName,
@@ -58,6 +58,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
     if (text.isNotEmpty) {
       msgController.clear();
       controller.sendMessage(text);
+      Future.delayed(Duration(milliseconds: 100), () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      });
     }
   }
 
@@ -128,7 +131,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                 width: 25.w,
                 height: 2.8.h,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(90),
                 ),
                 margin: EdgeInsets.only(right: 16),
@@ -163,6 +166,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                       return ListView.builder(
                         controller: scrollController,
                         physics: BouncingScrollPhysics(),
+                        reverse: false,
                         padding: EdgeInsets.symmetric(
                           horizontal: 8.0,
                           vertical: 12.0,

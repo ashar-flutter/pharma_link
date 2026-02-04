@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -81,8 +82,71 @@ class _VendorJobListsState extends State<VendorJobLists> {
                             height: 3.h,
                           ),
                         ),
+
                         SizedBox(width: 3.w),
-                        Image.asset("assets/images/as11.png", height: 4.h),
+                        (currentUser.userType == 2 &&
+                            currentUser.owners.isNotEmpty &&
+                            currentUser.owners[0]['image'] != null &&
+                            currentUser.owners[0]['image'].toString().isNotEmpty)
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: CachedNetworkImage(
+                            imageUrl: currentUser.owners[0]['image'].toString(),
+                            width: 4.h,
+                            height: 4.h,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 4.h,
+                              height: 4.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              width: 4.h,
+                              height: 4.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                          ),
+                        )
+                            : (currentUser.image.isNotEmpty)
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: CachedNetworkImage(
+                            imageUrl: currentUser.image,
+                            width: 4.h,
+                            height: 4.h,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 4.h,
+                              height: 4.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              width: 4.h,
+                              height: 4.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                          ),
+                        )
+                            : Container(
+                          width: 4.h,
+                          height: 4.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
                       ],
                     ),
                   ],

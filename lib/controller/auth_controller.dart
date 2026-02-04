@@ -15,6 +15,8 @@ import 'package:linkpharma/services/firestore_services.dart';
 import 'package:linkpharma/services/loadingService.dart';
 import 'package:linkpharma/services/local_storage.dart';
 
+import '../page/auth/select_role_page.dart';
+
 class AuthController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -435,5 +437,68 @@ class AuthController extends GetxController {
       owners.removeAt(index);
       update();
     }
+  }
+
+  Future<void> signOut(BuildContext context) async {
+    try {
+      LoadingService.I.show(context);
+
+      await AuthServices.I.logOut();
+
+      await LocalStorage.I.clear();
+
+      _clearAllControllers();
+
+      currentUser = UserModel();
+
+      LoadingService.I.dismiss();
+
+      Get.offAll(SelectRolePage());
+
+      EasyLoading.showSuccess("Signed out successfully!");
+    } catch (e) {
+      LoadingService.I.dismiss();
+      EasyLoading.showError("Error signing out: ${e.toString()}");
+      logger.e("Sign out error: $e");
+    }
+  }
+
+  // Helper function to clear all controllers
+  void _clearAllControllers() {
+    emailController.clear();
+    passwordController.clear();
+    reEnterPasswordController.clear();
+    descriptionController.clear();
+
+    // User side
+    firstNameController.clear();
+    lastNameController.clear();
+    cityController.clear();
+    userCountryController.clear();
+    experienceController.clear();
+    rppsController.clear();
+
+    // Vendor side
+    addressController.clear();
+    countryController.clear();
+    zipCodeController.clear();
+    siretController.clear();
+
+    // Change password
+    oldPasswordController.clear();
+    newPasswordController.clear();
+    confirmPasswordController.clear();
+
+    // Clear other data
+    profileImage = null;
+    cv = null;
+    owners.clear();
+    images = [
+      {'type': 'add'},
+    ];
+    services.clear();
+    role = null;
+    selectIndex = 0;
+    rememberMe = true;
   }
 }

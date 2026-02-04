@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/models/chat_model.dart';
 import 'package:linkpharma/services/firestorage_services.dart';
+import 'package:flutter/material.dart';
 
 class ChatController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -16,24 +17,23 @@ class ChatController extends GetxController {
   List<ChatConversation> _conversations = [];
   List<ChatMessage> _messages = [];
   final Map<String, StreamSubscription> _messageListeners = {};
+  final Map<String, StreamSubscription> _onlineListeners = {};
   StreamSubscription? _convListener;
   String _searchText = '';
+
+  final Map<String, Map<String, String>> _userInfoCache = {};
 
   String? _receiverId;
   String? _receiverName;
   String? _receiverImage;
-
-  // ✅ Minimal safe fix for receiverOnline
-  bool receiverOnline = false;
-  bool get isReceiverOnline => receiverOnline;
+  bool _receiverOnline = false;
 
   List<ChatConversation> get conversations => _conversations;
   List<ChatMessage> get messages => _messages;
+  bool get receiverOnline => _receiverOnline;
 
-  String get _currentUserId =>
-      FirebaseAuth.instance.currentUser?.uid ?? currentUser.id;
-  String get _currentUserName =>
-      "${currentUser.firstName} ${currentUser.lastName}";
+  String get _currentUserId => FirebaseAuth.instance.currentUser?.uid ?? currentUser.id;
+  String get _currentUserName => "${currentUser.firstName} ${currentUser.lastName}";
   String get _currentUserImage => currentUser.image;
 
   @override
@@ -48,6 +48,9 @@ class ChatController extends GetxController {
   @override
   void onClose() {
     for (var sub in _messageListeners.values) {
+      sub.cancel();
+    }
+    for (var sub in _onlineListeners.values) {
       sub.cancel();
     }
     _convListener?.cancel();
@@ -73,22 +76,22 @@ class ChatController extends GetxController {
       final data = doc.data() as Map<String, dynamic>;
       final convId = data['conversationId'] ?? doc.id;
 
-      final index = _conversations.indexWhere(
-        (c) => c.conversationId == convId,
-      );
+      final index = _conversations.indexWhere((c) => c.conversationId == convId);
 
       if (index != -1) {
         final unread = data['unreadCount_$_currentUserId'] ?? 0;
         final lastMsgData = data['lastMessage'] as Map<String, dynamic>? ?? {};
 
+        final existing = _conversations[index];
+
         _conversations[index] = ChatConversation(
           conversationId: convId,
-          user1Id: data['user1Id']?.toString() ?? '',
-          user1Name: data['user1Name']?.toString() ?? '',
-          user1Image: data['user1Image']?.toString() ?? '',
-          user2Id: data['user2Id']?.toString() ?? '',
-          user2Name: data['user2Name']?.toString() ?? '',
-          user2Image: data['user2Image']?.toString() ?? '',
+          user1Id: existing.user1Id,
+          user1Name: existing.user1Name,
+          user1Image: existing.user1Image,
+          user2Id: existing.user2Id,
+          user2Name: existing.user2Name,
+          user2Image: existing.user2Image,
           lastMessage: ChatMessage.fromJson(lastMsgData),
           lastMessageTime: (data['lastMessageTime'] as Timestamp).toDate(),
           unreadCount: unread,
@@ -97,23 +100,64 @@ class ChatController extends GetxController {
       }
     }
 
-    _conversations.sort(
-      (a, b) => b.lastMessageTime.compareTo(a.lastMessageTime),
-    );
+    _conversations.sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
     update(['inbox']);
+  }
+
+  Future<Map<String, String>> _getUserInfoWithCache(String userId) async {
+    // Cache check
+    if (_userInfoCache.containsKey(userId)) {
+      return _userInfoCache[userId]!;
+    }
+
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        final data = doc.data();
+
+        String image = '';
+        String name = '';
+
+        // Vendor check
+        if (data?['owners'] != null && (data?['owners'] as List).isNotEmpty) {
+          final owner = (data?['owners'] as List)[0] as Map<String, dynamic>;
+          image = owner['image']?.toString() ?? '';
+          name = owner['name']?.toString() ??
+              '${owner['name']?.toString() ?? ''} ${owner['sureName']?.toString() ?? ''}';
+          name = name.trim();
+        }
+        // Regular user
+        else {
+          image = data?['image']?.toString() ?? '';
+          name = data?['name']?.toString() ??
+              '${data?['firstName']?.toString() ?? ''} ${data?['lastName']?.toString() ?? ''}';
+          name = name.trim();
+        }
+
+        final info = {
+          'image': image,
+          'name': name.isNotEmpty ? name : 'Unknown User',
+        };
+
+        _userInfoCache[userId] = info;
+        return info;
+      }
+    } catch (_) {}
+
+    final fallback = {
+      'image': '',
+      'name': 'Unknown User',
+    };
+
+    _userInfoCache[userId] = fallback;
+    return fallback;
   }
 
   Future<void> _loadConversations() async {
     try {
       final userId = _currentUserId;
-      final query1 = await _firestore
-          .collection('conversations')
-          .where('user1Id', isEqualTo: userId)
-          .get();
-      final query2 = await _firestore
-          .collection('conversations')
-          .where('user2Id', isEqualTo: userId)
-          .get();
+      final query1 = await _firestore.collection('conversations').where('user1Id', isEqualTo: userId).get();
+      final query2 = await _firestore.collection('conversations').where('user2Id', isEqualTo: userId).get();
 
       List<ChatConversation> allConvs = [];
 
@@ -123,39 +167,27 @@ class ChatController extends GetxController {
         final u2 = data['user2Id']?.toString() ?? '';
         final otherId = u1 == userId ? u2 : u1;
 
-        String otherImage = '';
-        String otherName = '';
+        final otherInfo = await _getUserInfoWithCache(otherId);
+        final otherImage = otherInfo['image'] ?? '';
+        final otherName = otherInfo['name'] ?? '';
 
-        try {
-          final otherDoc = await _firestore
-              .collection('users')
-              .doc(otherId)
-              .get();
-          if (otherDoc.exists) {
-            final otherData = otherDoc.data();
-            otherImage = otherData?['image']?.toString() ?? '';
-            otherName =
-                otherData?['name']?.toString() ??
-                '${otherData?['firstName']?.toString() ?? ''} ${otherData?['lastName']?.toString() ?? ''}';
-            otherName = otherName.trim();
-          }
-        } catch (_) {
-          otherImage = u1 == userId
-              ? (data['user2Image']?.toString() ?? '')
-              : (data['user1Image']?.toString() ?? '');
-          otherName = u1 == userId
-              ? (data['user2Name']?.toString() ?? '')
-              : (data['user1Name']?.toString() ?? '');
-        }
+        // Current user info (cache se ya direct)
+        final currentInfo = await _getUserInfoWithCache(userId);
+        final currentImage = currentInfo['image']?.isNotEmpty == true
+            ? currentInfo['image']!
+            : _currentUserImage;
+        final currentName = currentInfo['name']?.isNotEmpty == true
+            ? currentInfo['name']!
+            : _currentUserName;
 
         final convData = {
           'conversationId': data['conversationId'] ?? doc.id,
           'user1Id': u1,
-          'user1Name': u1 == userId ? _currentUserName : otherName,
-          'user1Image': u1 == userId ? _currentUserImage : otherImage,
+          'user1Name': u1 == userId ? currentName : otherName,
+          'user1Image': u1 == userId ? currentImage : otherImage,
           'user2Id': u2,
-          'user2Name': u2 == userId ? _currentUserName : otherName,
-          'user2Image': u2 == userId ? _currentUserImage : otherImage,
+          'user2Name': u2 == userId ? currentName : otherName,
+          'user2Image': u2 == userId ? currentImage : otherImage,
           'lastMessage': data['lastMessage'] ?? {},
           'lastMessageTime': data['lastMessageTime'] ?? Timestamp.now(),
           'unreadCount': data['unreadCount_$userId'] ?? 0,
@@ -173,15 +205,13 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> openChat(
-    String id,
-    String name,
-    String image,
-    String? role,
-  ) async {
+  Future<void> openChat(String id, String name, String image, String? role) async {
     _receiverId = id;
     _receiverName = name;
     _receiverImage = image;
+    _receiverOnline = false;
+
+    update(['header']);
 
     _messages.clear();
     update(['messages']);
@@ -189,9 +219,29 @@ class ChatController extends GetxController {
     await _loadMessages(id);
     await _startMessagesListener(id);
     await _markAsRead(id);
+    await _startOnlineStatusListener(id);
+  }
 
-    receiverOnline = false;
-    update(['header']);
+  Future<void> _startOnlineStatusListener(String otherId) async {
+    if (_onlineListeners.containsKey(otherId)) {
+      _onlineListeners[otherId]!.cancel();
+    }
+
+    final subscription = _firestore
+        .collection('users')
+        .doc(otherId)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final isOnline = data['isOnline'] ?? false;
+
+        _receiverOnline = isOnline;
+        update(['header']);
+      }
+    });
+
+    _onlineListeners[otherId] = subscription;
   }
 
   Future<void> _loadMessages(String otherId) async {
@@ -228,11 +278,11 @@ class ChatController extends GetxController {
         .orderBy('timestamp', descending: false)
         .snapshots()
         .listen((snapshot) {
-          _messages = snapshot.docs
-              .map((doc) => ChatMessage.fromJson(doc.data()))
-              .toList();
-          update(['messages']);
-        });
+      _messages = snapshot.docs
+          .map((doc) => ChatMessage.fromJson(doc.data()))
+          .toList();
+      update(['messages']);
+    });
 
     _messageListeners[convId] = subscription;
   }
@@ -244,9 +294,7 @@ class ChatController extends GetxController {
         'unreadCount_$_currentUserId': 0,
       });
 
-      final index = _conversations.indexWhere(
-        (c) => c.conversationId == convId,
-      );
+      final index = _conversations.indexWhere((c) => c.conversationId == convId);
       if (index != -1) {
         _conversations[index] = ChatConversation(
           conversationId: convId,
@@ -314,11 +362,9 @@ class ChatController extends GetxController {
       final batch = _firestore.batch();
       final convRef = _firestore.collection('conversations').doc(convId);
       batch.set(convRef, conversationData, SetOptions(merge: true));
-      batch.set(
-        convRef.collection('messages').doc(messageId),
-        messageData.toJson(),
-      );
+      batch.set(convRef.collection('messages').doc(messageId), messageData.toJson());
       await batch.commit();
+
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();
@@ -377,11 +423,9 @@ class ChatController extends GetxController {
       final batch = _firestore.batch();
       final convRef = _firestore.collection('conversations').doc(convId);
       batch.set(convRef, conversationData, SetOptions(merge: true));
-      batch.set(
-        convRef.collection('messages').doc(messageId),
-        imageMessage.toJson(),
-      );
+      batch.set(convRef.collection('messages').doc(messageId), imageMessage.toJson());
       await batch.commit();
+
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();
@@ -394,23 +438,24 @@ class ChatController extends GetxController {
     for (var sub in _messageListeners.values) {
       sub.cancel();
     }
+    for (var sub in _onlineListeners.values) {
+      sub.cancel();
+    }
     _messageListeners.clear();
+    _onlineListeners.clear();
     _messages.clear();
     _receiverId = null;
     _receiverName = null;
     _receiverImage = null;
+    _receiverOnline = false;
     update(['messages']);
   }
 
   List<ChatConversation> get filteredConvs {
     if (_searchText.isEmpty) return _conversations;
     return _conversations.where((conv) {
-      return conv.otherUserName.toLowerCase().contains(
-            _searchText.toLowerCase(),
-          ) ||
-          conv.lastMessage.message.toLowerCase().contains(
-            _searchText.toLowerCase(),
-          );
+      return conv.otherUserName.toLowerCase().contains(_searchText.toLowerCase()) ||
+          conv.lastMessage.message.toLowerCase().contains(_searchText.toLowerCase());
     }).toList();
   }
 
@@ -425,15 +470,27 @@ class ChatController extends GetxController {
     final msgDate = DateTime(time.year, time.month, time.day);
 
     if (msgDate.isAtSameMomentAs(today)) {
-      final hour = time.hour > 12
-          ? time.hour - 12
-          : time.hour == 0
-          ? 12
-          : time.hour;
+      final hour = time.hour > 12 ? time.hour - 12 : time.hour == 0 ? 12 : time.hour;
       final minute = time.minute.toString().padLeft(2, '0');
       final ampm = time.hour >= 12 ? 'PM' : 'AM';
       return "$hour:$minute $ampm";
     }
     return "${time.day}/${time.month}";
   }
+
+
+  void scrollToBottom(ScrollController controller) {
+    Future.delayed(const Duration(milliseconds: 80), () {
+      if (controller.hasClients) {
+        controller.animateTo(
+          controller.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+
+
 }
