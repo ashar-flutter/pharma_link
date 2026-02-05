@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/models/job_model.dart';
@@ -362,6 +363,60 @@ class JobController extends GetxController {
   }
 
   // ===================== VENDOR SIDE - JOB MANAGEMENT =====================
+  /// ✅ FIXED: Get vendor coordinates when creating job
+  Future<Map<String, double>> _getVendorCoordinates() async {
+    try {
+      // First, check if vendor has coordinates in profile
+      if (currentUser.latitude != 0.0 && currentUser.longitude != 0.0) {
+        print("✅ Using vendor profile coordinates");
+        return {
+          'lat': currentUser.latitude,
+          'lng': currentUser.longitude,
+        };
+      }
+
+      // If not, try to get current location
+      print("🔄 Getting vendor current location...");
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      print("✅ Got vendor location: ${position.latitude}, ${position.longitude}");
+      return {
+        'lat': position.latitude,
+        'lng': position.longitude,
+      };
+    } catch (e) {
+      print("❌ Error getting coordinates: $e");
+
+      // Fallback to city center based on city name
+      Map<String, List<double>> cityCenters = {
+        'lahore': [31.5204, 74.3587],
+        'karachi': [24.8607, 67.0011],
+        'islamabad': [33.7294, 73.1899],
+        'rawalpindi': [33.5731, 73.2092],
+        'faisalabad': [31.4181, 72.9124],
+        'multan': [30.1575, 71.4340],
+        'peshawar': [34.0151, 71.5249],
+        'quetta': [30.2176, 67.0100],
+        'gujranwala': [32.1814, 74.1889],
+        'hyderabad': [25.3960, 68.4719],
+      };
+
+      String city = currentUser.city.toLowerCase();
+      if (cityCenters.containsKey(city)) {
+        print("✅ Using fallback city center for $city");
+        return {
+          'lat': cityCenters[city]![0],
+          'lng': cityCenters[city]![1],
+        };
+      }
+
+      print("⚠️ No coordinates available");
+      return {'lat': 0.0, 'lng': 0.0};
+    }
+  }
+
   Future<void> addJob(bool isActive) async {
     if (titleController.text.isEmpty) {
       EasyLoading.showInfo("Please enter job title");
@@ -390,27 +445,31 @@ class JobController extends GetxController {
 
     EasyLoading.show(status: "Saving job...");
 
-    JobModel newJob = JobModel()
-      ..id = DateTime
-          .now()
-          .millisecondsSinceEpoch
-          .toString()
-      ..vendorId = currentUser.id
-      ..vendorName = currentUser.firstName
-      ..vendorImage = currentUser.images.isNotEmpty ? currentUser.images[0] : ""
-      ..vendorAddress = currentUser.address
-      ..vendorCity = currentUser.city
-      ..vendorCountry = currentUser.country
-      ..title = titleController.text
-      ..contractType = contractType!
-      ..coefficient = coefficientController.text
-      ..startDate = selectedDate!
-      ..roleDescription = roleDescriptionController.text
-      ..hoursPerWeek = hoursController.text
-      ..isActive = isActive
-      ..createdAt = DateTime.now();
-
     try {
+      // ✅ Get vendor coordinates
+      Map<String, double> coords = await _getVendorCoordinates();
+
+      JobModel newJob = JobModel()
+        ..id = DateTime.now().millisecondsSinceEpoch.toString()
+        ..vendorId = currentUser.id
+        ..vendorName = currentUser.firstName
+        ..vendorImage = currentUser.images.isNotEmpty ? currentUser.images[0] : ""
+        ..vendorAddress = currentUser.address
+        ..vendorCity = currentUser.city
+        ..vendorCountry = currentUser.country
+        ..title = titleController.text
+        ..contractType = contractType!
+        ..coefficient = coefficientController.text
+        ..startDate = selectedDate!
+        ..roleDescription = roleDescriptionController.text
+        ..hoursPerWeek = hoursController.text
+        ..isActive = isActive
+        ..createdAt = DateTime.now()
+        ..vendorLat = coords['lat']! // ✅ ADD COORDINATES
+        ..vendorLng = coords['lng']!; // ✅ ADD COORDINATES
+
+      print("📍 Creating job with coordinates: ${coords['lat']}, ${coords['lng']}");
+
       await FirestoreServices.I.addJob(newJob);
       if (currentUser.userType == 2) {
         await loadVendorJobs();
@@ -421,7 +480,8 @@ class JobController extends GetxController {
       );
       Get.back();
     } catch (e) {
-      EasyLoading.showError("Failed to save job");
+      print("❌ Error adding job: $e");
+      EasyLoading.showError("Failed to save job: $e");
     }
   }
 

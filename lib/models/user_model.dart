@@ -27,6 +27,10 @@ class UserModel {
   List<String> services = [];
 
 
+  double latitude = 0.0;
+  double longitude = 0.0;
+
+
   List<Map<String, dynamic>> schedule = [
     {"isOpen": true, "start": "08:30", "end": "19:00"}, // Mo
     {"isOpen": true, "start": "08:30", "end": "19:00"}, // Tu
@@ -65,6 +69,12 @@ class UserModel {
     siret = json['siret'];
     images = List<String>.from(json['images']);
     services = List<String>.from(json['services']);
+
+
+
+    latitude = (json['latitude'] ?? 0.0).toDouble();
+    longitude = (json['longitude'] ?? 0.0).toDouble();
+
 
     //  SCHEDULE FIX: Proper loading
     schedule = List<Map<String, dynamic>>.from(json['schedule'] ?? [
@@ -110,6 +120,10 @@ class UserModel {
 
     data['owners'] = owners;
     data['pharmacies'] = pharmacies;
+
+    data["latitude"]=latitude;
+    data["longitude"]=longitude;
+
     return data;
   }
 }
