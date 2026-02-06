@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:linkpharma/config/global.dart';
@@ -29,16 +30,12 @@ class JobController extends GetxController {
   bool _hasMoreJobs = true;
   bool _isLoadingMore = false;
 
-  // ===================== CRITICAL FIX: SEPARATE DATA STORAGE =====================
+  // ===================== DATA STORAGE =====================
   List<JobModel> _allUserJobs = [];
   List<JobModel> _allVendorJobs = [];
 
   int get currentPage => _currentPage;
-
-  // Vendor cache
   Map<String, UserModel> vendorCache = {};
-
-  // User specific data
   List<Map<String, dynamic>> appliedJobs = [];
   List<Map<String, dynamic>> savedJobs = [];
   bool isLoadingAppliedJobs = false;
@@ -50,7 +47,6 @@ class JobController extends GetxController {
     _loadDataBasedOnUserType();
   }
 
-  // ===================== PRIVATE FUNCTION: USER TYPE CHECK =====================
   void _loadDataBasedOnUserType() {
     if (currentUser.userType == 1) {
       loadJobs();
@@ -64,7 +60,6 @@ class JobController extends GetxController {
   // ===================== USER SIDE - JOB APPLICATIONS =====================
   Future<void> loadAppliedJobs() async {
     if (isLoadingAppliedJobs) return;
-
     isLoadingAppliedJobs = true;
     update();
 
@@ -72,9 +67,9 @@ class JobController extends GetxController {
       appliedJobs = await FirestoreServices.I.getUserJobApplications(
         currentUser.id,
       );
-      if (kDebugMode) print(" Loaded ${appliedJobs.length} applications");
+      if (kDebugMode) print("✅ Loaded ${appliedJobs.length} applications");
     } catch (e) {
-      if (kDebugMode) print(" Error loading applied jobs: $e");
+      if (kDebugMode) print("❌ Error loading applied jobs: $e");
       appliedJobs = [];
     }
 
@@ -84,9 +79,7 @@ class JobController extends GetxController {
 
   bool hasUserApplied(String jobId) {
     for (var app in appliedJobs) {
-      if (app['application']['jobId'] == jobId) {
-        return true;
-      }
+      if (app['application']['jobId'] == jobId) return true;
     }
     return false;
   }
@@ -229,14 +222,12 @@ class JobController extends GetxController {
   Map<String, List<JobModel>> getJobsGroupedByCity() {
     Map<String, List<JobModel>> groupedJobs = {};
 
-    // Filter by country first
     List<JobModel> countryJobs = _allUserJobs
         .where(
           (job) => job.isActive && job.vendorCountry == currentUser.country,
-    )
+        )
         .toList();
 
-    // Group by city
     for (var job in countryJobs) {
       String cityKey = job.vendorCity;
 
@@ -277,7 +268,7 @@ class JobController extends GetxController {
     List<JobModel> countryJobs = _allUserJobs
         .where(
           (job) => job.isActive && job.vendorCountry == currentUser.country,
-    )
+        )
         .toList();
 
     for (var job in countryJobs) {
@@ -293,10 +284,10 @@ class JobController extends GetxController {
     return _allUserJobs
         .where(
           (job) =>
-      job.isActive &&
-          job.vendorCountry == currentUser.country &&
-          job.vendorCity == city,
-    )
+              job.isActive &&
+              job.vendorCountry == currentUser.country &&
+              job.vendorCity == city,
+        )
         .toList();
   }
 
@@ -309,9 +300,9 @@ class JobController extends GetxController {
 
     try {
       savedJobs = await FirestoreServices.I.getSavedJobsForUser(currentUser.id);
-      if (kDebugMode) print(" Loaded ${savedJobs.length} saved jobs");
+      if (kDebugMode) print("✅ Loaded ${savedJobs.length} saved jobs");
     } catch (e) {
-      if (kDebugMode) print(" Error loading saved jobs: $e");
+      if (kDebugMode) print("❌ Error loading saved jobs: $e");
       savedJobs = [];
     }
 
@@ -331,7 +322,7 @@ class JobController extends GetxController {
           jobId: job.id,
           userId: currentUser.id,
         );
-        if (kDebugMode) print(" Job unsaved: ${job.id}");
+        if (kDebugMode) print("✅ Job unsaved: ${job.id}");
       } else {
         await FirestoreServices.I.saveJobForUser(
           jobId: job.id,
@@ -343,13 +334,13 @@ class JobController extends GetxController {
           contractType: job.contractType,
           hoursPerWeek: job.hoursPerWeek,
         );
-        if (kDebugMode) print(" Job saved: ${job.id}");
+        if (kDebugMode) print("✅ Job saved: ${job.id}");
       }
 
       await loadSavedJobs();
       update();
     } catch (e) {
-      if (kDebugMode) print(" Error toggling save status: $e");
+      if (kDebugMode) print("❌ Error toggling save status: $e");
     }
   }
 
@@ -362,57 +353,80 @@ class JobController extends GetxController {
     return false;
   }
 
-  // ===================== VENDOR SIDE - JOB MANAGEMENT =====================
-  /// ✅ FIXED: Get vendor coordinates when creating job
+  // ===================== VENDOR SIDE - JOB MANAGEMENT - DYNAMIC COORDINATES =====================
+
+  /// ✅ DYNAMIC: Get vendor coordinates from UserModel or Geolocator
+  /// Falls back to address geocoding if available (worldwide support)
   Future<Map<String, double>> _getVendorCoordinates() async {
     try {
-      // First, check if vendor has coordinates in profile
+      // STEP 1: Check if vendor has coordinates in profile
       if (currentUser.latitude != 0.0 && currentUser.longitude != 0.0) {
-        print("✅ Using vendor profile coordinates");
-        return {
-          'lat': currentUser.latitude,
-          'lng': currentUser.longitude,
-        };
+        print(
+          "✅ Using vendor profile coordinates: ${currentUser.latitude}, ${currentUser.longitude}",
+        );
+        return {'lat': currentUser.latitude, 'lng': currentUser.longitude};
       }
 
-      // If not, try to get current location
-      print("🔄 Getting vendor current location...");
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      // STEP 2: Try to get current location
+      print("🔄 Requesting current location...");
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        print(
+          "✅ Got vendor location: ${position.latitude}, ${position.longitude}",
+        );
+        return {'lat': position.latitude, 'lng': position.longitude};
+      } catch (e) {
+        print("⚠️ Location permission denied, trying geocoding...");
+      }
 
-      print("✅ Got vendor location: ${position.latitude}, ${position.longitude}");
-      return {
-        'lat': position.latitude,
-        'lng': position.longitude,
-      };
+      // STEP 3: Try to geocode address (WORLDWIDE SUPPORT)
+      if (currentUser.address.isNotEmpty && currentUser.city.isNotEmpty) {
+        try {
+          String fullAddress =
+              "${currentUser.address}, ${currentUser.city}, ${currentUser.country}";
+          print("🔄 Geocoding address: $fullAddress");
+
+          List<geo.Location> locations = await geo.locationFromAddress(
+            fullAddress,
+          );
+
+          if (locations.isNotEmpty) {
+            double lat = locations[0].latitude;
+            double lng = locations[0].longitude;
+            print("✅ Geocoded coordinates: $lat, $lng");
+            return {'lat': lat, 'lng': lng};
+          }
+        } catch (e) {
+          print("⚠️ Geocoding failed: $e");
+        }
+      }
+
+      // STEP 4: Try to geocode just city name (FALLBACK)
+      try {
+        String cityAddress = "${currentUser.city}, ${currentUser.country}";
+        print("🔄 Geocoding city: $cityAddress");
+
+        List<geo.Location> locations = await geo.locationFromAddress(
+          cityAddress,
+        );
+
+        if (locations.isNotEmpty) {
+          double lat = locations[0].latitude;
+          double lng = locations[0].longitude;
+          print("✅ City geocoded: $lat, $lng");
+          return {'lat': lat, 'lng': lng};
+        }
+      } catch (e) {
+        print("⚠️ City geocoding failed: $e");
+      }
+
+      // STEP 5: Default fallback
+      print("⚠️ No coordinates available, using default");
+      return {'lat': 0.0, 'lng': 0.0};
     } catch (e) {
-      print("❌ Error getting coordinates: $e");
-
-      // Fallback to city center based on city name
-      Map<String, List<double>> cityCenters = {
-        'lahore': [31.5204, 74.3587],
-        'karachi': [24.8607, 67.0011],
-        'islamabad': [33.7294, 73.1899],
-        'rawalpindi': [33.5731, 73.2092],
-        'faisalabad': [31.4181, 72.9124],
-        'multan': [30.1575, 71.4340],
-        'peshawar': [34.0151, 71.5249],
-        'quetta': [30.2176, 67.0100],
-        'gujranwala': [32.1814, 74.1889],
-        'hyderabad': [25.3960, 68.4719],
-      };
-
-      String city = currentUser.city.toLowerCase();
-      if (cityCenters.containsKey(city)) {
-        print("✅ Using fallback city center for $city");
-        return {
-          'lat': cityCenters[city]![0],
-          'lng': cityCenters[city]![1],
-        };
-      }
-
-      print("⚠️ No coordinates available");
+      print("❌ Critical error in _getVendorCoordinates: $e");
       return {'lat': 0.0, 'lng': 0.0};
     }
   }
@@ -446,14 +460,16 @@ class JobController extends GetxController {
     EasyLoading.show(status: "Saving job...");
 
     try {
-      // ✅ Get vendor coordinates
+      // ✅ Get vendor coordinates (DYNAMIC, WORLDWIDE)
       Map<String, double> coords = await _getVendorCoordinates();
 
       JobModel newJob = JobModel()
         ..id = DateTime.now().millisecondsSinceEpoch.toString()
         ..vendorId = currentUser.id
         ..vendorName = currentUser.firstName
-        ..vendorImage = currentUser.images.isNotEmpty ? currentUser.images[0] : ""
+        ..vendorImage = currentUser.images.isNotEmpty
+            ? currentUser.images[0]
+            : ""
         ..vendorAddress = currentUser.address
         ..vendorCity = currentUser.city
         ..vendorCountry = currentUser.country
@@ -465,10 +481,12 @@ class JobController extends GetxController {
         ..hoursPerWeek = hoursController.text
         ..isActive = isActive
         ..createdAt = DateTime.now()
-        ..vendorLat = coords['lat']! // ✅ ADD COORDINATES
-        ..vendorLng = coords['lng']!; // ✅ ADD COORDINATES
+        ..vendorLat = coords['lat']!
+        ..vendorLng = coords['lng']!;
 
-      print("📍 Creating job with coordinates: ${coords['lat']}, ${coords['lng']}");
+      print(
+        "📍 Creating job with coordinates: ${coords['lat']}, ${coords['lng']}",
+      );
 
       await FirestoreServices.I.addJob(newJob);
       if (currentUser.userType == 2) {
@@ -544,12 +562,11 @@ class JobController extends GetxController {
     return vendorJobs
         .where(
           (job) => job.contractType.toLowerCase().contains(type.toLowerCase()),
-    )
+        )
         .toList();
   }
 
   bool get hasMoreJobs => _hasMoreJobs;
-
   bool get isLoadingMore => _isLoadingMore;
 
   // ===================== COMMON FUNCTIONS =====================
@@ -573,7 +590,7 @@ class JobController extends GetxController {
     if (currentUser.userType != 1) return false;
     String userCity = currentUser.city;
     return _allUserJobs.any(
-          (job) => job.isActive && job.vendorCity == userCity,
+      (job) => job.isActive && job.vendorCity == userCity,
     );
   }
 
@@ -585,18 +602,14 @@ class JobController extends GetxController {
   // ===================== LOAD VENDOR JOB =====================
   Future<void> loadVendorJob(String jobId) async {
     try {
-      // Load job
       vendorJob = await FirestoreServices.I.getVendorJobById(jobId);
-
-      // Load applications
       vendorApplications = await FirestoreServices.I.getVendorJobApplications(
         jobId,
       );
-
       update();
     } catch (e) {
       if (kDebugMode) {
-        print("Error loading vendor job: $e");
+        print("❌ Error loading vendor job: $e");
       }
     }
   }
@@ -616,7 +629,7 @@ class JobController extends GetxController {
 
       if (success) {
         vendorJob!.isActive = newStatus;
-        await loadVendorJobs(); // Refresh list
+        await loadVendorJobs();
         EasyLoading.showSuccess(
           newStatus ? 'Job activated' : 'Job deactivated',
         );

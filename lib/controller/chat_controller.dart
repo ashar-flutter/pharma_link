@@ -9,10 +9,13 @@ import 'package:linkpharma/models/chat_model.dart';
 import 'package:linkpharma/services/firestorage_services.dart';
 import 'package:flutter/material.dart';
 
+import '../config/online_status_manager.dart';
+
 class ChatController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirestorageServices _storage = FirestorageServices.I;
   final ImagePicker _picker = ImagePicker();
+  final OnlineStatusManager _statusManager = OnlineStatusManager();
 
   List<ChatConversation> _conversations = [];
   List<ChatMessage> _messages = [];
@@ -32,8 +35,10 @@ class ChatController extends GetxController {
   List<ChatMessage> get messages => _messages;
   bool get receiverOnline => _receiverOnline;
 
-  String get _currentUserId => FirebaseAuth.instance.currentUser?.uid ?? currentUser.id;
-  String get _currentUserName => "${currentUser.firstName} ${currentUser.lastName}";
+  String get _currentUserId =>
+      FirebaseAuth.instance.currentUser?.uid ?? currentUser.id;
+  String get _currentUserName =>
+      "${currentUser.firstName} ${currentUser.lastName}";
   String get _currentUserImage => currentUser.image;
 
   @override
@@ -76,7 +81,9 @@ class ChatController extends GetxController {
       final data = doc.data() as Map<String, dynamic>;
       final convId = data['conversationId'] ?? doc.id;
 
-      final index = _conversations.indexWhere((c) => c.conversationId == convId);
+      final index = _conversations.indexWhere(
+        (c) => c.conversationId == convId,
+      );
 
       if (index != -1) {
         final unread = data['unreadCount_$_currentUserId'] ?? 0;
@@ -100,12 +107,13 @@ class ChatController extends GetxController {
       }
     }
 
-    _conversations.sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
+    _conversations.sort(
+      (a, b) => b.lastMessageTime.compareTo(a.lastMessageTime),
+    );
     update(['inbox']);
   }
 
   Future<Map<String, String>> _getUserInfoWithCache(String userId) async {
-    // Cache check
     if (_userInfoCache.containsKey(userId)) {
       return _userInfoCache[userId]!;
     }
@@ -118,18 +126,17 @@ class ChatController extends GetxController {
         String image = '';
         String name = '';
 
-        // Vendor check
         if (data?['owners'] != null && (data?['owners'] as List).isNotEmpty) {
           final owner = (data?['owners'] as List)[0] as Map<String, dynamic>;
           image = owner['image']?.toString() ?? '';
-          name = owner['name']?.toString() ??
+          name =
+              owner['name']?.toString() ??
               '${owner['name']?.toString() ?? ''} ${owner['sureName']?.toString() ?? ''}';
           name = name.trim();
-        }
-        // Regular user
-        else {
+        } else {
           image = data?['image']?.toString() ?? '';
-          name = data?['name']?.toString() ??
+          name =
+              data?['name']?.toString() ??
               '${data?['firstName']?.toString() ?? ''} ${data?['lastName']?.toString() ?? ''}';
           name = name.trim();
         }
@@ -144,10 +151,7 @@ class ChatController extends GetxController {
       }
     } catch (_) {}
 
-    final fallback = {
-      'image': '',
-      'name': 'Unknown User',
-    };
+    final fallback = {'image': '', 'name': 'Unknown User'};
 
     _userInfoCache[userId] = fallback;
     return fallback;
@@ -156,8 +160,14 @@ class ChatController extends GetxController {
   Future<void> _loadConversations() async {
     try {
       final userId = _currentUserId;
-      final query1 = await _firestore.collection('conversations').where('user1Id', isEqualTo: userId).get();
-      final query2 = await _firestore.collection('conversations').where('user2Id', isEqualTo: userId).get();
+      final query1 = await _firestore
+          .collection('conversations')
+          .where('user1Id', isEqualTo: userId)
+          .get();
+      final query2 = await _firestore
+          .collection('conversations')
+          .where('user2Id', isEqualTo: userId)
+          .get();
 
       List<ChatConversation> allConvs = [];
 
@@ -171,7 +181,6 @@ class ChatController extends GetxController {
         final otherImage = otherInfo['image'] ?? '';
         final otherName = otherInfo['name'] ?? '';
 
-        // Current user info (cache se ya direct)
         final currentInfo = await _getUserInfoWithCache(userId);
         final currentImage = currentInfo['image']?.isNotEmpty == true
             ? currentInfo['image']!
@@ -205,7 +214,12 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> openChat(String id, String name, String image, String? role) async {
+  Future<void> openChat(
+    String id,
+    String name,
+    String image,
+    String? role,
+  ) async {
     _receiverId = id;
     _receiverName = name;
     _receiverImage = image;
@@ -219,7 +233,7 @@ class ChatController extends GetxController {
     await _loadMessages(id);
     await _startMessagesListener(id);
     await _markAsRead(id);
-    await _startOnlineStatusListener(id);
+    await _startOnlineStatusListener(id); // FIXED
   }
 
   Future<void> _startOnlineStatusListener(String otherId) async {
@@ -232,14 +246,15 @@ class ChatController extends GetxController {
         .doc(otherId)
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        final isOnline = data['isOnline'] ?? false;
+          if (snapshot.exists) {
+            final data = snapshot.data() as Map<String, dynamic>;
 
-        _receiverOnline = isOnline;
-        update(['header']);
-      }
-    });
+            // ✅ CORRECT: OnlineStatusManager use karein
+            _receiverOnline = _statusManager.checkIfUserIsOnline(data);
+
+            update(['header']);
+          }
+        });
 
     _onlineListeners[otherId] = subscription;
   }
@@ -278,11 +293,11 @@ class ChatController extends GetxController {
         .orderBy('timestamp', descending: false)
         .snapshots()
         .listen((snapshot) {
-      _messages = snapshot.docs
-          .map((doc) => ChatMessage.fromJson(doc.data()))
-          .toList();
-      update(['messages']);
-    });
+          _messages = snapshot.docs
+              .map((doc) => ChatMessage.fromJson(doc.data()))
+              .toList();
+          update(['messages']);
+        });
 
     _messageListeners[convId] = subscription;
   }
@@ -294,7 +309,9 @@ class ChatController extends GetxController {
         'unreadCount_$_currentUserId': 0,
       });
 
-      final index = _conversations.indexWhere((c) => c.conversationId == convId);
+      final index = _conversations.indexWhere(
+        (c) => c.conversationId == convId,
+      );
       if (index != -1) {
         _conversations[index] = ChatConversation(
           conversationId: convId,
@@ -323,7 +340,7 @@ class ChatController extends GetxController {
     if (text.isEmpty || _receiverId == null) return;
 
     final messageId = DateTime.now().millisecondsSinceEpoch.toString();
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
     final messageData = ChatMessage(
       id: messageId,
@@ -362,9 +379,11 @@ class ChatController extends GetxController {
       final batch = _firestore.batch();
       final convRef = _firestore.collection('conversations').doc(convId);
       batch.set(convRef, conversationData, SetOptions(merge: true));
-      batch.set(convRef.collection('messages').doc(messageId), messageData.toJson());
+      batch.set(
+        convRef.collection('messages').doc(messageId),
+        messageData.toJson(),
+      );
       await batch.commit();
-
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();
@@ -423,9 +442,11 @@ class ChatController extends GetxController {
       final batch = _firestore.batch();
       final convRef = _firestore.collection('conversations').doc(convId);
       batch.set(convRef, conversationData, SetOptions(merge: true));
-      batch.set(convRef.collection('messages').doc(messageId), imageMessage.toJson());
+      batch.set(
+        convRef.collection('messages').doc(messageId),
+        imageMessage.toJson(),
+      );
       await batch.commit();
-
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();
@@ -454,8 +475,12 @@ class ChatController extends GetxController {
   List<ChatConversation> get filteredConvs {
     if (_searchText.isEmpty) return _conversations;
     return _conversations.where((conv) {
-      return conv.otherUserName.toLowerCase().contains(_searchText.toLowerCase()) ||
-          conv.lastMessage.message.toLowerCase().contains(_searchText.toLowerCase());
+      return conv.otherUserName.toLowerCase().contains(
+            _searchText.toLowerCase(),
+          ) ||
+          conv.lastMessage.message.toLowerCase().contains(
+            _searchText.toLowerCase(),
+          );
     }).toList();
   }
 
@@ -467,17 +492,40 @@ class ChatController extends GetxController {
   String formatTime(DateTime time) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
     final msgDate = DateTime(time.year, time.month, time.day);
 
-    if (msgDate.isAtSameMomentAs(today)) {
-      final hour = time.hour > 12 ? time.hour - 12 : time.hour == 0 ? 12 : time.hour;
-      final minute = time.minute.toString().padLeft(2, '0');
-      final ampm = time.hour >= 12 ? 'PM' : 'AM';
-      return "$hour:$minute $ampm";
-    }
-    return "${time.day}/${time.month}";
-  }
+    final hour = time.hour > 12
+        ? time.hour - 12
+        : time.hour == 0
+        ? 12
+        : time.hour;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final ampm = time.hour >= 12 ? 'PM' : 'AM';
+    final timeStr = "$hour:$minute $ampm";
 
+    if (msgDate == today) {
+      return timeStr;
+    } else if (msgDate == yesterday) {
+      return "Yesterday, $timeStr";
+    } else {
+      final monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return "${time.day} ${monthNames[time.month - 1]} ${time.year}, $timeStr";
+    }
+  }
 
   void scrollToBottom(ScrollController controller) {
     Future.delayed(const Duration(milliseconds: 80), () {
@@ -490,7 +538,4 @@ class ChatController extends GetxController {
       }
     });
   }
-
-
-
 }

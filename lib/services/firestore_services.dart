@@ -553,7 +553,6 @@ class FirestoreServices {
 
 // ===================== VENDOR JOB FUNCTIONS =====================
 
-  /// Get job by ID
   Future<JobModel?> getVendorJobById(String jobId) async {
     try {
       final doc = await _instance.collection('jobs').doc(jobId).get();
@@ -572,7 +571,6 @@ class FirestoreServices {
     }
   }
 
-  /// Get applications for specific job
   Future<List<Map<String, dynamic>>> getVendorJobApplications(String jobId) async {
     try {
       final snapshot = await _instance
@@ -601,7 +599,6 @@ class FirestoreServices {
     }
   }
 
-  /// Update job status
   Future<bool> updateVendorJobStatus(String jobId, bool isActive) async {
     try {
       await _instance

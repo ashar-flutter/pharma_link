@@ -25,48 +25,24 @@ class SearchPageState extends State<SearchPage> {
   final MapController _mapController = Get.put(MapController());
   GoogleMapController? _googleMapController;
   final TextEditingController _searchController = TextEditingController();
-  bool _markersInitialized = false;
 
   CameraPosition get _initialCameraPosition {
-    if (_mapController.currentLat != 0.0 && _mapController.currentLng != 0.0) {
-      return CameraPosition(
-        target: LatLng(_mapController.currentLat, _mapController.currentLng),
-        zoom: 12.0,
-      );
-    }
-
-    if (_mapController.currentUser.country.toLowerCase().contains("pakistan")) {
-      return CameraPosition(
-        target: LatLng(33.6844, 73.0479),
-        zoom: 12.0,
-      );
-    } else if (_mapController.currentUser.country.toLowerCase().contains("india")) {
-      return CameraPosition(
-        target: LatLng(28.6139, 77.2090),
-        zoom: 12.0,
-      );
-    } else {
-      return CameraPosition(
-        target: LatLng(20.5937, 78.9629),
-        zoom: 3.0,
-      );
-    }
+    return _mapController.initialCameraPosition;
   }
 
   @override
   void initState() {
     super.initState();
-    // ✅ Add small delay to ensure map is ready
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        addMarkers();
-        _moveMapToCurrentPosition();
+        _addMarkers();
+        _moveMapToPosition();
       }
     });
   }
 
-  /// ✅ Smooth map movement to current position
-  Future<void> _moveMapToCurrentPosition() async {
+  ///  Move map to current position smoothly
+  Future<void> _moveMapToPosition() async {
     if (_googleMapController == null) return;
 
     if (_mapController.currentLat != 0.0 && _mapController.currentLng != 0.0) {
@@ -79,42 +55,28 @@ class SearchPageState extends State<SearchPage> {
     }
   }
 
-  /// ✅ FIXED: Add markers with proper error handling and real-time updates
-  Future<void> addMarkers() async {
-    if (_mapController.mapJobs.isEmpty) {
-      print("❌ No jobs available for markers");
-      return;
-    }
-
-    print("✅ Starting to add ${_mapController.mapJobs.length} markers");
+  ///  Add markers from jobs
+  Future<void> _addMarkers() async {
+    if (_mapController.mapJobs.isEmpty) return;
 
     Set<Marker> markers = {};
-    int validMarkers = 0;
-    int invalidMarkers = 0;
 
     for (var job in _mapController.mapJobs) {
       if (job.vendorLat != 0.0 && job.vendorLng != 0.0) {
         try {
-          print("🔄 Processing job: ${job.vendorName} at (${job.vendorLat}, ${job.vendorLng})");
-
-          BitmapDescriptor markerIcon = await getMarkerIcon(
+          BitmapDescriptor markerIcon = await _getMarkerIcon(
             job.vendorImage.isNotEmpty ? job.vendorImage : "",
-            Size(200.0, 200.0), // ✅ BIGGER SIZE
+            const Size(170.0, 170.0),
           );
 
           Marker marker = Marker(
             markerId: MarkerId(job.id),
             position: LatLng(job.vendorLat, job.vendorLng),
             icon: markerIcon,
-            infoWindow: InfoWindow(
-              title: job.vendorName,
-              snippet: job.title,
-            ),
+            infoWindow: InfoWindow(title: job.vendorName, snippet: job.title),
             onTap: () {
-              print("📍 Tapped marker: ${job.id}");
               _mapController.selectMarker(job.id);
 
-              // ✅ Smooth animation to marker
               if (_googleMapController != null) {
                 _googleMapController!.animateCamera(
                   CameraUpdate.newLatLngZoom(
@@ -127,47 +89,30 @@ class SearchPageState extends State<SearchPage> {
           );
 
           markers.add(marker);
-          validMarkers++;
-          print("✅ Marker added: ${job.vendorName}");
         } catch (e) {
-          invalidMarkers++;
-          print("❌ Error adding marker for ${job.vendorName}: $e");
+          //
         }
-      } else {
-        invalidMarkers++;
-        print("⚠️ Job has no valid coordinates: ${job.vendorName}");
       }
     }
 
-    print("📊 Markers Summary: Valid=$validMarkers, Invalid=$invalidMarkers");
-
-    // ✅ Update controller with markers
     _mapController.markers = markers;
     _mapController.update();
-
-    // ✅ Force UI rebuild
-    if (mounted) {
-      setState(() {
-        _markersInitialized = true;
-      });
-    }
   }
 
-  /// ✅ IMPROVED: Better marker icon generation with larger circles
-  Future<BitmapDescriptor> getMarkerIcon(String imagePath, Size size) async {
+  Future<BitmapDescriptor> _getMarkerIcon(String imagePath, Size size) async {
     try {
       final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
       final Canvas canvas = Canvas(pictureRecorder);
 
-      final Radius radius = Radius.circular(size.width / 2); // ✅ Perfect circle
-      final double shadowWidth = 20.0; // ✅ BIGGER shadow
-      final double borderWidth = 5.0; // ✅ BIGGER border
+      final Radius radius = Radius.circular(size.width / 2);
+      final double shadowWidth = 12.0;
+      final double borderWidth = 3.0;
       final double imageOffset = shadowWidth + borderWidth;
 
-      // ✅ Shadow layer (outer circle)
+      // Shadow
       final Paint shadowPaint = Paint()
-        ..color = MyColors.primary.withOpacity(0.3)
-        ..maskFilter = MaskFilter.blur(BlurStyle.outer, 8.0);
+        ..color = MyColors.primary.withValues(alpha: 0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 6.0);
 
       canvas.drawRRect(
         RRect.fromRectAndCorners(
@@ -180,7 +125,6 @@ class SearchPageState extends State<SearchPage> {
         shadowPaint,
       );
 
-      // ✅ Border layer
       final Paint borderPaint = Paint()
         ..color = MyColors.primary
         ..style = PaintingStyle.fill;
@@ -196,96 +140,71 @@ class SearchPageState extends State<SearchPage> {
         borderPaint,
       );
 
-      // ✅ Inner circle for image
-      Rect oval = Rect.fromLTWH(
+      final Rect oval = Rect.fromLTWH(
         imageOffset,
         imageOffset,
         size.width - (imageOffset * 2),
         size.height - (imageOffset * 2),
       );
 
-      // ✅ Clip to circle
       canvas.clipPath(Path()..addOval(oval));
 
-      // ✅ Load and paint image
       if (imagePath.isNotEmpty) {
         try {
-          ui.Image image = await getImageFromPath(imagePath);
+          final ui.Image image = await _getImageFromPath(imagePath);
           paintImage(
             canvas: canvas,
             image: image,
             rect: oval,
             fit: BoxFit.cover,
           );
-          print("✅ Image loaded for marker");
         } catch (e) {
-          print("⚠️ Image load failed: $e, using fallback color");
           final Paint fallbackPaint = Paint()..color = Colors.grey[400]!;
           canvas.drawOval(oval, fallbackPaint);
         }
       } else {
-        // ✅ Fallback: solid color circle
         final Paint fallbackPaint = Paint()..color = Colors.grey[300]!;
         canvas.drawOval(oval, fallbackPaint);
       }
 
-      // ✅ Convert to bitmap
-      final ui.Image markerAsImage = await pictureRecorder.endRecording().toImage(
-        size.width.toInt(),
-        size.height.toInt(),
-      );
+      final ui.Image markerAsImage = await pictureRecorder
+          .endRecording()
+          .toImage(size.width.toInt(), size.height.toInt());
 
       final ByteData? byteData = await markerAsImage.toByteData(
         format: ui.ImageByteFormat.png,
       );
 
-      if (byteData == null) {
-        throw Exception("Failed to convert image to bytes");
-      }
+      if (byteData == null) throw Exception("Image conversion failed");
 
       final Uint8List uint8List = byteData.buffer.asUint8List();
-      print("✅ Marker icon generated, size: ${uint8List.length} bytes");
-
-      return BitmapDescriptor.fromBytes(uint8List);
+      return BitmapDescriptor.bytes(uint8List);
     } catch (e) {
-      print("❌ Marker icon generation failed: $e");
       return BitmapDescriptor.defaultMarker;
     }
   }
 
-  Future<ui.Image> getImageFromPath(String imagePath) async {
-    try {
-      print("🔄 Loading image from: $imagePath");
+  Future<ui.Image> _getImageFromPath(String imagePath) async {
+    final Uint8List bytes = (await NetworkAssetBundle(
+      Uri.parse(imagePath),
+    ).load(imagePath)).buffer.asUint8List();
 
-      Uint8List bytes = (await NetworkAssetBundle(
-        Uri.parse(imagePath),
-      ).load(imagePath)).buffer.asUint8List();
+    final Completer<ui.Image> completer = Completer();
 
-      final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, (ui.Image img) {
+      completer.complete(img);
+    });
 
-      ui.decodeImageFromList(bytes, (ui.Image img) {
-        completer.complete(img);
-      });
-
-      final image = await completer.future;
-      print("✅ Image decoded successfully");
-      return image;
-    } catch (e) {
-      print("❌ Image loading failed: $e");
-      throw e;
-    }
+    return completer.future;
   }
 
   void _handleSearch(String query) {
-    print("🔍 Search query: '$query'");
     _mapController.handleSearch(query);
 
-    // ✅ Re-add markers after search
-    Future.delayed(Duration(milliseconds: 1200), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
-        print("🔄 Updating markers after search...");
-        addMarkers();
-        _moveMapToCurrentPosition();
+        _addMarkers();
+        _moveMapToPosition();
       }
     });
   }
@@ -307,30 +226,19 @@ class SearchPageState extends State<SearchPage> {
             bottom: false,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Column(
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      onPress(
-                        ontap: () => Get.back(),
-                        child: Image.asset(
-                          "assets/images/back.png",
-                          height: 3.5.h,
-                        ),
-                      ),
-                      Spacer(),
-                      text_widget(
-                        "Search",
-                        color: Colors.white,
-                        fontSize: 21.sp,
-                      ),
-                      Spacer(),
-                      Image.asset(
-                        "assets/images/back.png",
-                        height: 3.5.h,
-                        color: Colors.transparent,
-                      ),
-                    ],
+                  onPress(
+                    ontap: () => Get.back(),
+                    child: Image.asset("assets/images/back.png", height: 3.5.h),
+                  ),
+                  const Spacer(),
+                  text_widget("Search", color: Colors.white, fontSize: 21.sp),
+                  const Spacer(),
+                  Image.asset(
+                    "assets/images/back.png",
+                    height: 3.5.h,
+                    color: Colors.transparent,
                   ),
                 ],
               ),
@@ -339,7 +247,7 @@ class SearchPageState extends State<SearchPage> {
           SizedBox(height: 2.h),
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -349,7 +257,7 @@ class SearchPageState extends State<SearchPage> {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
@@ -361,16 +269,18 @@ class SearchPageState extends State<SearchPage> {
                           myLocationButtonEnabled: true,
                           zoomControlsEnabled: true,
                           initialCameraPosition: _initialCameraPosition,
-                          markers: controller.markers, // ✅ Real-time updates
+                          markers: controller.markers,
                           onMapCreated: (GoogleMapController mapController) {
-                            print("🗺️ Map created");
                             _googleMapController = mapController;
-                            Future.delayed(Duration(milliseconds: 300), () {
-                              if (mounted) {
-                                addMarkers();
-                                _moveMapToCurrentPosition();
-                              }
-                            });
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () {
+                                if (mounted) {
+                                  _addMarkers();
+                                  _moveMapToPosition();
+                                }
+                              },
+                            );
                           },
                         );
                       },
@@ -437,7 +347,7 @@ class SearchPageState extends State<SearchPage> {
                               onPress(
                                 ontap: () => Get.to(FilterPage()),
                                 child: Container(
-                                  padding: EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(10),
                                   height: 5.h,
                                   width: 12.w,
                                   decoration: BoxDecoration(
@@ -460,12 +370,11 @@ class SearchPageState extends State<SearchPage> {
                             ],
                           ),
                         ),
-                        Spacer(),
-                        // ✅ Bottom job list - shows when marker selected
+                        const Spacer(),
                         GetBuilder<MapController>(
                           builder: (controller) {
                             if (controller.filteredJobs.isEmpty) {
-                              return SizedBox();
+                              return const SizedBox();
                             }
 
                             return SingleChildScrollView(
@@ -477,76 +386,117 @@ class SearchPageState extends State<SearchPage> {
                                       Get.to(() => PharmaceyDetail(job: job));
                                     },
                                     child: Padding(
-                                      padding: EdgeInsets.only(left: 18, right: 18),
+                                      padding: EdgeInsets.only(
+                                        left: 18,
+                                        right: 18,
+                                      ),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: controller.selectedMarkerJobId == job.id
+                                          color:
+                                              controller.selectedMarkerJobId ==
+                                                  job.id
                                               ? MyColors.primary
                                               : const Color(0xffF6F6F6),
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.1),
+                                              color: Colors.black.withValues(
+                                                alpha: 0.1,
+                                              ),
                                               blurRadius: 10,
                                               spreadRadius: 2,
                                             ),
                                           ],
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             ClipRRect(
-                                              borderRadius: const BorderRadius.vertical(
-                                                top: Radius.circular(18),
-                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.vertical(
+                                                    top: Radius.circular(18),
+                                                  ),
                                               child: job.vendorImage.isNotEmpty
                                                   ? Image.network(
-                                                job.vendorImage,
-                                                width: 40.w,
-                                                height: 14.h,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 40.w,
-                                                    height: 14.h,
-                                                    color: MyColors.primary.withOpacity(0.1),
-                                                    child: Icon(Icons.image_not_supported),
-                                                  );
-                                                },
-                                              )
+                                                      job.vendorImage,
+                                                      width: 40.w,
+                                                      height: 14.h,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder:
+                                                          (
+                                                            context,
+                                                            error,
+                                                            stackTrace,
+                                                          ) {
+                                                            return Container(
+                                                              width: 40.w,
+                                                              height: 14.h,
+                                                              color: MyColors
+                                                                  .primary
+                                                                  .withValues(
+                                                                    alpha: 0.1,
+                                                                  ),
+                                                              child: const Icon(
+                                                                Icons
+                                                                    .image_not_supported,
+                                                              ),
+                                                            );
+                                                          },
+                                                    )
                                                   : Container(
-                                                width: 40.w,
-                                                height: 14.h,
-                                                color: MyColors.primary.withOpacity(0.1),
-                                                child: Icon(Icons.store),
-                                              ),
+                                                      width: 40.w,
+                                                      height: 14.h,
+                                                      color: MyColors.primary
+                                                          .withValues(
+                                                            alpha: 0.1,
+                                                          ),
+                                                      child: const Icon(
+                                                        Icons.store,
+                                                      ),
+                                                    ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 6,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 6,
+                                                  ),
                                               child: Text(
                                                 job.vendorName,
                                                 style: GoogleFonts.plusJakartaSans(
-                                                  color: controller.selectedMarkerJobId == job.id
+                                                  color:
+                                                      controller
+                                                              .selectedMarkerJobId ==
+                                                          job.id
                                                       ? Colors.white
-                                                      : Color(0xff1E1E1E),
+                                                      : const Color(0xff1E1E1E),
                                                   fontSize: 14.5.sp,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                  ),
                                               child: Text(
                                                 "${job.title} - ${job.contractType}",
                                                 style: GoogleFonts.plusJakartaSans(
-                                                  color: controller.selectedMarkerJobId == job.id
+                                                  color:
+                                                      controller
+                                                              .selectedMarkerJobId ==
+                                                          job.id
                                                       ? Colors.white70
-                                                      : Color.fromARGB(110, 30, 30, 30),
+                                                      : const Color.fromARGB(
+                                                          110,
+                                                          30,
+                                                          30,
+                                                          30,
+                                                        ),
                                                   fontSize: 12.sp,
                                                   fontWeight: FontWeight.w400,
                                                 ),

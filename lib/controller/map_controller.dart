@@ -1,17 +1,18 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:linkpharma/models/job_model.dart';
 
-import '../config/global.dart' as Global;
+import '../config/global.dart' as global;
 import '../models/user_model.dart';
 import '../services/map_service.dart';
 
 class MapController extends GetxController {
   final MapServices _mapServices = MapServices();
 
-  // ===================== VARIABLES =====================
+  // ===================== STATE =====================
   List<JobModel> mapJobs = [];
   List<JobModel> filteredJobs = [];
   Set<Marker> markers = {};
@@ -23,140 +24,109 @@ class MapController extends GetxController {
   Timer? _searchTimer;
   bool isSearching = false;
   List<String> citySuggestions = [];
+  String currentSearchPlace = ""; // Track current search place
 
-  // Current user access ke liye
-  UserModel get currentUser => Global.currentUser;
+  UserModel get currentUser => global.currentUser;
 
   @override
   void onInit() {
     super.onInit();
-    print("🚀 MapController initializing...");
+    _initializeMap();
+  }
 
+  void _initializeMap() {
     currentCity = currentUser.city;
     currentCountry = currentUser.country;
 
-    print("📍 User - City: $currentCity, Country: $currentCountry");
-
-    // ✅ Request location permission on init
     _requestLocationPermission();
-
-    // ✅ Load initial jobs
     _loadJobsForCurrentCity();
-
-    // ✅ Load city suggestions
     _loadCitySuggestions();
   }
 
-  // ===================== LOCATION PERMISSION =====================
   Future<void> _requestLocationPermission() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
-        print("⚠️ Location permission denied, requesting...");
         permission = await Geolocator.requestPermission();
       }
 
       if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
-        print("✅ Location permission granted");
         _getUserCurrentLocation();
-      } else {
-        print("❌ Location permission not granted");
       }
     } catch (e) {
-      print("❌ Location permission error: $e");
+      // Location error - app continues
     }
   }
 
   Future<void> _getUserCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       currentLat = position.latitude;
       currentLng = position.longitude;
-
-      print("✅ User location: $currentLat, $currentLng");
       update();
     } catch (e) {
-      print("❌ Error getting user location: $e");
+      // Location not available
     }
   }
 
-  // ===================== LOAD CITY SUGGESTIONS =====================
   Future<void> _loadCitySuggestions() async {
     try {
-      citySuggestions = await _mapServices.getAllCitiesForCountry(currentCountry);
-      print("✅ Loaded ${citySuggestions.length} city suggestions");
+      citySuggestions = await _mapServices.getAllCitiesForCountry(
+        currentCountry,
+      );
       update();
     } catch (e) {
-      print("❌ Error loading suggestions: $e");
+      // Error loading suggestions
     }
   }
 
-  // ===================== LOAD JOBS FOR CURRENT CITY =====================
   Future<void> _loadJobsForCurrentCity() async {
     if (currentUser.userType != 1) return;
 
     try {
-      print("🔄 Loading jobs for $currentCity in $currentCountry...");
-
       mapJobs = await _mapServices.getJobsByCity(
         country: currentCountry,
         city: currentCity,
       );
 
-      // ✅ Clear previous state
       filteredJobs = [];
       markers.clear();
       selectedMarkerJobId = null;
 
-      // ✅ Set map center to first job location
       if (mapJobs.isNotEmpty) {
-        int validCoords = 0;
         for (var job in mapJobs) {
           if (job.vendorLat != 0.0 && job.vendorLng != 0.0) {
             currentLat = job.vendorLat;
             currentLng = job.vendorLng;
-            validCoords++;
             break;
           }
         }
-        print("✅ Loaded ${mapJobs.length} jobs - $validCoords have valid coordinates");
-      } else {
-        print("⚠️ No jobs found for $currentCity");
       }
     } catch (e) {
-      print("❌ Error loading jobs: $e");
       mapJobs = [];
     }
 
     update();
   }
 
-  // ===================== SEARCH FUNCTIONALITY =====================
   void handleSearch(String query) {
-    print("🔍 handleSearch called with: '$query'");
-
-    // ✅ Cancel previous timer
     if (_searchTimer != null) {
       _searchTimer!.cancel();
     }
 
-    // ✅ Show loading state
     isSearching = true;
     update();
 
-    // ✅ Debounce search by 800ms
-    _searchTimer = Timer(Duration(milliseconds: 800), () {
+    _searchTimer = Timer(const Duration(milliseconds: 300), () {
       if (query.trim().isEmpty) {
-        print("🔄 Search cleared - resetting to current city");
         _loadJobsForCurrentCity();
       } else {
-        print("🔍 Searching for: ${query.trim()}");
-        _searchCityJobs(query.trim());
+        _searchPlace(query.trim());
       }
 
       isSearching = false;
@@ -164,80 +134,88 @@ class MapController extends GetxController {
     });
   }
 
-  Future<void> _searchCityJobs(String cityName) async {
+  Future<void> _searchPlace(String placeName) async {
     try {
-      print("🔍 Searching for city: $cityName");
+      if (kDebugMode) {
+        print('\n🔵 ========== PLACE SEARCH START ==========');
+      }
+      if (kDebugMode) {
+        print('User searching: "$placeName"');
+      }
 
-      // ✅ Get jobs for searched city
-      mapJobs = await _mapServices.getJobsByCityName(cityName: cityName);
+      var result = await _mapServices.searchPlaceAndJobs(placeName: placeName);
 
-      // ✅ Reset UI state
+      mapJobs = result['jobs'] ?? [];
+      currentLat = result['lat'] ?? 0.0;
+      currentLng = result['lng'] ?? 0.0;
+      bool hasJobs = result['hasJobs'] ?? false;
+
+      if (kDebugMode) {
+        print('Search Results:');
+      }
+      if (kDebugMode) {
+        print('Place: "$placeName"');
+      }
+      if (kDebugMode) {
+        print('Coordinates: $currentLat, $currentLng');
+      }
+      if (kDebugMode) {
+        print('Jobs found: ${mapJobs.length}');
+      }
+      if (kDebugMode) {
+        print('Has jobs: $hasJobs');
+      }
+
       filteredJobs = [];
       markers.clear();
       selectedMarkerJobId = null;
 
-      if (mapJobs.isNotEmpty) {
-        // ✅ Find first valid location and center map there
-        int validCoords = 0;
-        for (var job in mapJobs) {
-          if (job.vendorLat != 0.0 && job.vendorLng != 0.0) {
-            currentLat = job.vendorLat;
-            currentLng = job.vendorLng;
-            currentCity = job.vendorCity;
-            currentCountry = job.vendorCountry;
-            validCoords++;
-            break;
-          }
+      if (hasJobs) {
+        if (kDebugMode) {
+          print('Jobs found! Showing markers...');
         }
-        print("✅ Found ${mapJobs.length} jobs in $cityName - $validCoords with valid coordinates");
-        print("📍 Map center: $currentLat, $currentLng");
       } else {
-        print("⚠️ No jobs found for $cityName");
-        currentLat = 0.0;
-        currentLng = 0.0;
+        if (kDebugMode) {
+          print(' No jobs, but showing place on map...');
+        }
+      }
+
+      if (kDebugMode) {
+        print(' ========== PLACE SEARCH END ==========\n');
       }
     } catch (e) {
-      print("❌ Search error: $e");
+      if (kDebugMode) {
+        print(' Error in search: $e');
+      }
       mapJobs = [];
-      currentLat = 0.0;
-      currentLng = 0.0;
     }
 
     update();
   }
 
-  // ===================== MARKER SELECTION =====================
   void selectMarker(String jobId) {
-    print("📍 Marker selected: $jobId");
     selectedMarkerJobId = jobId;
     filteredJobs = mapJobs.where((job) => job.id == jobId).toList();
-
-    print("✅ Filtered jobs count: ${filteredJobs.length}");
-    if (filteredJobs.isNotEmpty) {
-      print("✅ Job: ${filteredJobs.first.vendorName}");
-    }
-
     update();
   }
 
-  // ===================== CAMERA POSITION =====================
   CameraPosition get initialCameraPosition {
     if (currentLat != 0.0 && currentLng != 0.0) {
+      return CameraPosition(target: LatLng(currentLat, currentLng), zoom: 12.0);
+    }
+
+    if (currentUser.latitude != 0.0 && currentUser.longitude != 0.0) {
       return CameraPosition(
-        target: LatLng(currentLat, currentLng),
+        target: LatLng(currentUser.latitude, currentUser.longitude),
         zoom: 12.0,
       );
     }
 
-    return CameraPosition(
-      target: LatLng(0.0, 0.0),
-      zoom: 1.0,
-    );
+    return CameraPosition(target: const LatLng(20.0, 0.0), zoom: 2.0);
   }
 
   @override
   void onClose() {
-    print("🛑 MapController closing");
     _searchTimer?.cancel();
     super.onClose();
   }

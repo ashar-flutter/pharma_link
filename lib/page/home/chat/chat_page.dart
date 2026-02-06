@@ -32,10 +32,10 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   final ScrollController scrollController = ScrollController();
   final TextEditingController msgController = TextEditingController();
 
-
   @override
   void initState() {
-    super.initState();WidgetsBinding.instance.addPostFrameCallback((_) {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.openChat(
         widget.receiverId,
         widget.receiverName,
@@ -102,26 +102,31 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                         fontWeight: FontWeight.w600,
                       ),
                       SizedBox(height: 0.5.h),
-                      if (ctrl.receiverOnline)
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 3,
-                              backgroundColor: Colors.greenAccent,
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: ctrl.receiverOnline
+                                  ? Colors.green
+                                  : Colors.grey,
+                              shape: BoxShape.circle,
                             ),
-                            SizedBox(width: 1.w),
-                            text_widget(
-                              "Online",
-                              fontSize: 13.8.sp,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(width: 1.w),
+                          text_widget(
+                            ctrl.receiverOnline ? "Online" : "Offline",
+                            fontSize: 13.8.sp,
+                            color: ctrl.receiverOnline ? Colors.white : Colors.grey[300],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },
-              ),
+              )
             ],
           ),
           centerTitle: false,
@@ -166,7 +171,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                       return ListView.builder(
                         controller: scrollController,
                         physics: BouncingScrollPhysics(),
-                        reverse: false,
+                        reverse:false,
                         padding: EdgeInsets.symmetric(
                           horizontal: 8.0,
                           vertical: 12.0,
@@ -204,6 +209,13 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                                   child: CachedNetworkImage(
                                     imageUrl: msg.fileUrl!,
                                     fit: BoxFit.cover,
+                                    progressIndicatorBuilder:
+                                        (context, url, downloadProgress) =>
+                                            LinearProgressIndicator(
+                                              value: downloadProgress.progress,
+                                            ),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error, color: Colors.red),
                                   ),
                                 ),
                               ),

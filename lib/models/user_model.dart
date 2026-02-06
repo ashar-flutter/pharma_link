@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   String id = "";
   String firstName = ""; // pharmacist name
@@ -31,6 +33,10 @@ class UserModel {
   double longitude = 0.0;
 
 
+  bool isOnline = false;
+  DateTime? lastSeen;
+
+
   List<Map<String, dynamic>> schedule = [
     {"isOpen": true, "start": "08:30", "end": "19:00"}, // Mo
     {"isOpen": true, "start": "08:30", "end": "19:00"}, // Tu
@@ -41,12 +47,21 @@ class UserModel {
     {"isOpen": false, "start": "Closed", "end": ""}, // Su
   ];
 
+
+
+
   List<Map<String, dynamic>> owners = []; // {id, name, image, surname}
   List<String> pharmacies = []; // pharmacy_ids
 
   UserModel();
 
   UserModel.fromJson(Map<String, dynamic> json) {
+
+    isOnline = json['isOnline'] ?? false;
+    lastSeen = json['lastSeen'] != null ? (json['lastSeen'] as Timestamp).toDate() : null;
+
+
+
     id = json['id'];
     firstName = json['firstName'];
     description = json['description'];
@@ -123,6 +138,12 @@ class UserModel {
 
     data["latitude"]=latitude;
     data["longitude"]=longitude;
+
+
+    data['isOnline'] = isOnline;
+    data['lastSeen'] = lastSeen != null ? Timestamp.fromDate(lastSeen!) : null;
+
+
 
     return data;
   }
