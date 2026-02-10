@@ -3,12 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:linkpharma/models/user_model.dart';
 import '../models/job_model.dart';
+import '../models/notification_model.dart';
 
 class FirestoreServices {
   final FirebaseFirestore _instance = FirebaseFirestore.instance;
 
   static final FirestoreServices I = FirestoreServices._();
   FirestoreServices._();
+
+
+  FirebaseFirestore get firestore => _instance;
 
   // ===================== USER RELATED FUNCTIONS =====================
   Future<UserModel> getUser(String id) async {
@@ -576,7 +580,7 @@ class FirestoreServices {
       final snapshot = await _instance
           .collection('jobApplications')
           .where('jobId', isEqualTo: jobId)
-          .where('status', isEqualTo: 'pending')
+          .orderBy('appliedAt', descending: true)
           .get();
 
       List<Map<String, dynamic>> applications = [];
@@ -611,5 +615,65 @@ class FirestoreServices {
       return false;
     }
   }
+
+
+  // ===================== NOTIFICATIONS =====================
+
+  Future<void> sendAppNotification({
+    required String receiverId,
+    required String title,
+    required String description,
+    String type = 'chat',
+    Map<String, dynamic> data = const {},
+  }) async {
+    try {
+      final notificationId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      await _instance
+          .collection('user_notifications')
+          .doc(receiverId)
+          .collection('notifications')
+          .doc(notificationId)
+          .set({
+        'title': title,
+        'description': description,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': type,
+        'data': data,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      logger.e("Error sending app notification: $e");
+    }
+  }
+
+  Stream<List<AppNotification>> getUserNotificationsStream(String userId) {
+    return _instance
+        .collection('user_notifications')
+        .doc(userId)
+        .collection('notifications')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => AppNotification.fromFirestore(doc)).toList();
+    });
+  }
+
+  Future<void> markNotificationRead(String userId, String notificationId) async {
+    try {
+      await _instance
+          .collection('user_notifications')
+          .doc(userId)
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'isRead': true});
+    } catch (e) {
+      logger.e("Error marking notification read: $e");
+    }
+  }
+
+
+
 
 }

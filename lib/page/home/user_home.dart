@@ -1,13 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import 'package:linkpharma/config/global.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkpharma/config/colors.dart';
 import 'package:linkpharma/page/home/bottom_nav.dart';
 import 'package:linkpharma/page/home/user_drawer.dart';
 import 'package:linkpharma/page/home/filter_page.dart';
-import 'package:linkpharma/page/home/notification.dart';
 import 'package:linkpharma/page/home/pharmaceydetail.dart';
 import 'package:linkpharma/page/home/search_page.dart';
 import 'package:linkpharma/widgets/ontap.dart';
@@ -15,6 +14,8 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../controller/job_controller.dart';
 import '../../models/job_model.dart';
+import '../../controller/notification_controller.dart';
+import 'notification.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
@@ -26,6 +27,7 @@ class UserHomePage extends StatefulWidget {
 class _UserHomePageState extends State<UserHomePage> {
   Map<String, bool> expandedCities = {};
   final ScrollController _scrollController = ScrollController();
+  final NotificationController notificationController = Get.find<NotificationController>();
 
   @override
   void initState() {
@@ -77,14 +79,40 @@ class _UserHomePageState extends State<UserHomePage> {
                           ),
                         ),
                         Spacer(),
-                        onPress(
-                          ontap: () {
-                            Get.to(NotificationPage());
+                        GetBuilder<NotificationController>(
+                          id: 'notifications',
+                          builder: (ctrl) {
+                            return onPress(
+                              ontap: () {
+                                Get.to(NotificationPage());
+                              },
+                              child: Stack(
+                                children: [
+                                  Image.asset(
+                                    "assets/images/as15.png",
+                                    height: 2.7.h,
+                                  ),
+                                  if (ctrl.unreadCount > 0)
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: CircleAvatar(
+                                        radius: 0.8.h,
+                                        backgroundColor: Color(0xff10B66D),
+                                        child: Text(
+                                          ctrl.unreadCount.toString(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
                           },
-                          child: Image.asset(
-                            "assets/images/as15.png",
-                            height: 2.7.h,
-                          ),
                         ),
                         SizedBox(width: 3.w),
                         onPress(

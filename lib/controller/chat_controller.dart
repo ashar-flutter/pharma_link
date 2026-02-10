@@ -10,6 +10,7 @@ import 'package:linkpharma/services/firestorage_services.dart';
 import 'package:flutter/material.dart';
 
 import '../config/online_status_manager.dart';
+import '../services/firestore_services.dart';
 
 class ChatController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -384,6 +385,21 @@ class ChatController extends GetxController {
         messageData.toJson(),
       );
       await batch.commit();
+      print('sendMessage notification call hone wali hai for receiver: $_receiverId');
+      await FirestoreServices.I.sendAppNotification(
+        receiverId: _receiverId!,
+        title: "New Message",
+        description: "You have a new message from $_currentUserName",
+        type: 'chat',
+        data: {
+          'conversationId': convId,
+          'senderId': _currentUserId,
+          'senderName': _currentUserName,
+          'message': text,
+        },
+      );
+
+
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();
@@ -447,6 +463,22 @@ class ChatController extends GetxController {
         imageMessage.toJson(),
       );
       await batch.commit();
+
+      await FirestoreServices.I.sendAppNotification(
+        receiverId: _receiverId!,
+        title: "New Image",
+        description: "$_currentUserName sent you an image",
+        type: 'chat_image',
+        data: {
+          'conversationId': convId,
+          'senderId': _currentUserId,
+          'senderName': _currentUserName,
+          'fileUrl': url,
+        },
+      );
+
+
+
     } catch (_) {
       if (_messages.isNotEmpty && _messages.last.id == messageId) {
         _messages.removeLast();

@@ -79,16 +79,17 @@ class JobController extends GetxController {
 
   bool hasUserApplied(String jobId) {
     for (var app in appliedJobs) {
-      if (app['application']['jobId'] == jobId) return true;
+      if (app['application']['jobId'] == jobId) {
+        return app['application']['status'] != 'withdrawn';
+      }
     }
     return false;
   }
 
   bool canWithdrawApplication(String jobId) {
     for (var app in appliedJobs) {
-      if (app['application']['jobId'] == jobId &&
-          app['application']['status'] == 'pending') {
-        return true;
+      if (app['application']['jobId'] == jobId) {
+        return app['application']['status'] != 'withdrawn';
       }
     }
     return false;
@@ -133,6 +134,7 @@ class JobController extends GetxController {
 
       applicationMessageController.clear();
       await loadAppliedJobs();
+      update();
       EasyLoading.showSuccess("Application submitted!");
       Navigator.of(Get.context!).pop();
       Get.offAll(() => JobsAppliedPage());
@@ -300,9 +302,9 @@ class JobController extends GetxController {
 
     try {
       savedJobs = await FirestoreServices.I.getSavedJobsForUser(currentUser.id);
-      if (kDebugMode) print("✅ Loaded ${savedJobs.length} saved jobs");
+      if (kDebugMode) print(" Loaded ${savedJobs.length} saved jobs");
     } catch (e) {
-      if (kDebugMode) print("❌ Error loading saved jobs: $e");
+      if (kDebugMode) print(" Error loading saved jobs: $e");
       savedJobs = [];
     }
 
@@ -322,7 +324,7 @@ class JobController extends GetxController {
           jobId: job.id,
           userId: currentUser.id,
         );
-        if (kDebugMode) print("✅ Job unsaved: ${job.id}");
+        if (kDebugMode) print(" Job unsaved: ${job.id}");
       } else {
         await FirestoreServices.I.saveJobForUser(
           jobId: job.id,
@@ -334,13 +336,13 @@ class JobController extends GetxController {
           contractType: job.contractType,
           hoursPerWeek: job.hoursPerWeek,
         );
-        if (kDebugMode) print("✅ Job saved: ${job.id}");
+        if (kDebugMode) print(" Job saved: ${job.id}");
       }
 
       await loadSavedJobs();
       update();
     } catch (e) {
-      if (kDebugMode) print("❌ Error toggling save status: $e");
+      if (kDebugMode) print(" Error toggling save status: $e");
     }
   }
 
@@ -355,38 +357,43 @@ class JobController extends GetxController {
 
   // ===================== VENDOR SIDE - JOB MANAGEMENT - DYNAMIC COORDINATES =====================
 
-  /// ✅ DYNAMIC: Get vendor coordinates from UserModel or Geolocator
-  /// Falls back to address geocoding if available (worldwide support)
   Future<Map<String, double>> _getVendorCoordinates() async {
     try {
-      // STEP 1: Check if vendor has coordinates in profile
       if (currentUser.latitude != 0.0 && currentUser.longitude != 0.0) {
-        print(
-          "✅ Using vendor profile coordinates: ${currentUser.latitude}, ${currentUser.longitude}",
-        );
+        if (kDebugMode) {
+          print(
+            " Using vendor profile coordinates: ${currentUser.latitude}, ${currentUser.longitude}",
+          );
+        }
         return {'lat': currentUser.latitude, 'lng': currentUser.longitude};
       }
 
-      // STEP 2: Try to get current location
-      print("🔄 Requesting current location...");
+      if (kDebugMode) {
+        print(" Requesting current location...");
+      }
       try {
         Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
         );
-        print(
-          "✅ Got vendor location: ${position.latitude}, ${position.longitude}",
-        );
+        if (kDebugMode) {
+          print(
+            " Got vendor location: ${position.latitude}, ${position.longitude}",
+          );
+        }
         return {'lat': position.latitude, 'lng': position.longitude};
       } catch (e) {
-        print("⚠️ Location permission denied, trying geocoding...");
+        if (kDebugMode) {
+          print(" Location permission denied, trying geocoding...");
+        }
       }
 
-      // STEP 3: Try to geocode address (WORLDWIDE SUPPORT)
       if (currentUser.address.isNotEmpty && currentUser.city.isNotEmpty) {
         try {
           String fullAddress =
               "${currentUser.address}, ${currentUser.city}, ${currentUser.country}";
-          print("🔄 Geocoding address: $fullAddress");
+          if (kDebugMode) {
+            print(" Geocoding address: $fullAddress");
+          }
 
           List<geo.Location> locations = await geo.locationFromAddress(
             fullAddress,
@@ -395,18 +402,23 @@ class JobController extends GetxController {
           if (locations.isNotEmpty) {
             double lat = locations[0].latitude;
             double lng = locations[0].longitude;
-            print("✅ Geocoded coordinates: $lat, $lng");
+            if (kDebugMode) {
+              print(" Geocoded coordinates: $lat, $lng");
+            }
             return {'lat': lat, 'lng': lng};
           }
         } catch (e) {
-          print("⚠️ Geocoding failed: $e");
+          if (kDebugMode) {
+            print(" Geocoding failed: $e");
+          }
         }
       }
 
-      // STEP 4: Try to geocode just city name (FALLBACK)
       try {
         String cityAddress = "${currentUser.city}, ${currentUser.country}";
-        print("🔄 Geocoding city: $cityAddress");
+        if (kDebugMode) {
+          print(" Geocoding city: $cityAddress");
+        }
 
         List<geo.Location> locations = await geo.locationFromAddress(
           cityAddress,
@@ -415,18 +427,25 @@ class JobController extends GetxController {
         if (locations.isNotEmpty) {
           double lat = locations[0].latitude;
           double lng = locations[0].longitude;
-          print("✅ City geocoded: $lat, $lng");
+          if (kDebugMode) {
+            print(" City geocoded: $lat, $lng");
+          }
           return {'lat': lat, 'lng': lng};
         }
       } catch (e) {
-        print("⚠️ City geocoding failed: $e");
+        if (kDebugMode) {
+          print(" City geocoding failed: $e");
+        }
       }
 
-      // STEP 5: Default fallback
-      print("⚠️ No coordinates available, using default");
+      if (kDebugMode) {
+        print(" No coordinates available, using default");
+      }
       return {'lat': 0.0, 'lng': 0.0};
     } catch (e) {
-      print("❌ Critical error in _getVendorCoordinates: $e");
+      if (kDebugMode) {
+        print(" Critical error in _getVendorCoordinates: $e");
+      }
       return {'lat': 0.0, 'lng': 0.0};
     }
   }
@@ -460,7 +479,6 @@ class JobController extends GetxController {
     EasyLoading.show(status: "Saving job...");
 
     try {
-      // ✅ Get vendor coordinates (DYNAMIC, WORLDWIDE)
       Map<String, double> coords = await _getVendorCoordinates();
 
       JobModel newJob = JobModel()
@@ -484,9 +502,11 @@ class JobController extends GetxController {
         ..vendorLat = coords['lat']!
         ..vendorLng = coords['lng']!;
 
-      print(
-        "📍 Creating job with coordinates: ${coords['lat']}, ${coords['lng']}",
-      );
+      if (kDebugMode) {
+        print(
+          " Creating job with coordinates: ${coords['lat']}, ${coords['lng']}",
+        );
+      }
 
       await FirestoreServices.I.addJob(newJob);
       if (currentUser.userType == 2) {
@@ -498,7 +518,9 @@ class JobController extends GetxController {
       );
       Get.back();
     } catch (e) {
-      print("❌ Error adding job: $e");
+      if (kDebugMode) {
+        print(" Error adding job: $e");
+      }
       EasyLoading.showError("Failed to save job: $e");
     }
   }
@@ -609,7 +631,7 @@ class JobController extends GetxController {
       update();
     } catch (e) {
       if (kDebugMode) {
-        print("❌ Error loading vendor job: $e");
+        print(" Error loading vendor job: $e");
       }
     }
   }

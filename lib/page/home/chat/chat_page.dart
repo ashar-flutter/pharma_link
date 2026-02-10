@@ -118,7 +118,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                           text_widget(
                             ctrl.receiverOnline ? "Online" : "Offline",
                             fontSize: 13.8.sp,
-                            color: ctrl.receiverOnline ? Colors.white : Colors.grey[300],
+                            color: ctrl.receiverOnline
+                                ? Colors.white
+                                : Colors.grey[300],
                             fontWeight: FontWeight.w500,
                           ),
                         ],
@@ -126,7 +128,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                     ],
                   );
                 },
-              )
+              ),
             ],
           ),
           centerTitle: false,
@@ -171,7 +173,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                       return ListView.builder(
                         controller: scrollController,
                         physics: BouncingScrollPhysics(),
-                        reverse:false,
+                        reverse: false,
                         padding: EdgeInsets.symmetric(
                           horizontal: 8.0,
                           vertical: 12.0,

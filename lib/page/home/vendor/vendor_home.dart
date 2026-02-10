@@ -14,6 +14,7 @@ import 'package:linkpharma/widgets/ontap.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../controller/notification_controller.dart';
 import '../../../models/user_model.dart';
 import '../../../services/firestore_services.dart';
 
@@ -177,12 +178,40 @@ class _VendorHomeState extends State<VendorHome> {
                         ),
                       ),
                       const Spacer(),
-                      onPress(
-                        ontap: () => Get.to(NotificationPage()),
-                        child: Image.asset(
-                          "assets/images/as15.png",
-                          height: 2.5.h,
-                        ),
+                      GetBuilder<NotificationController>(
+                        id: 'notifications',
+                        builder: (ctrl) {
+                          return onPress(
+                            ontap: () {
+                              Get.to(NotificationPage());
+                            },
+                            child: Stack(
+                              children: [
+                                Image.asset(
+                                  "assets/images/as15.png",
+                                  height: 2.8.h,
+                                ),
+                                if (ctrl.unreadCount > 0)
+                                  Positioned(
+                                    right: -2,
+                                    top: 0,
+                                    child: CircleAvatar(
+                                      radius: 0.9.h,
+                                      backgroundColor: Color(0xff10B66D),
+                                      child: Text(
+                                        ctrl.unreadCount.toString(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(width: 3.w),
                       onPress(

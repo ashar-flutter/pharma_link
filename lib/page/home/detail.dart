@@ -15,8 +15,9 @@ import '../../models/user_model.dart';
 
 class DetailPage extends StatefulWidget {
   final JobModel job;
+  final String jobId;
 
-  const DetailPage({super.key, required this.job});
+  const DetailPage({super.key, required this.job, required this.jobId});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -30,11 +31,18 @@ class _DetailPageState extends State<DetailPage> {
   Map<String, dynamic>? applicationData;
   bool canWithdraw = false;
 
+
+
+
+
+
   @override
   void initState() {
     super.initState();
+    print("DEBUG: widget.job.id = ${widget.job.id}");
     loadData();
   }
+
 
   Future<void> loadData() async {
     try {
@@ -45,8 +53,11 @@ class _DetailPageState extends State<DetailPage> {
         pharmacyImages = [widget.job.vendorImage];
       }
 
-      applicationData = jobController.getApplicationForJob(widget.job.id);
-      canWithdraw = jobController.canWithdrawApplication(widget.job.id);
+      await jobController.loadAppliedJobs();
+
+      applicationData = jobController.getApplicationForJob(widget.jobId);
+      canWithdraw = applicationData != null ? (applicationData!['status'] ?? 'pending') != 'withdrawn' : false;
+
     } catch (e) {
       if (kDebugMode) print("Error loading detail data: $e");
     }
@@ -55,7 +66,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _showWithdrawDialog() {
-    if (!canWithdraw) return;
+    if (!canWithdraw || applicationData == null) return;
 
     Get.dialog(
       Dialog(
@@ -108,7 +119,7 @@ class _DetailPageState extends State<DetailPage> {
                     child: onPress(
                       ontap: () {
                         Get.back();
-                        if (applicationData != null && applicationData!['id'] != null) {
+                        if (applicationData != null && applicationData!.containsKey('id')) {
                           jobController.withdrawApplication(
                             applicationData!['id'],
                             widget.job.id,
@@ -171,6 +182,8 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+
+
     if (isLoading) {
       return Scaffold(
         backgroundColor: Color(0xff10B66D),
@@ -489,17 +502,19 @@ class _DetailPageState extends State<DetailPage> {
                           ],
                           SizedBox(height: 3.h),
                           onPress(
-                            ontap: canWithdraw ? _showWithdrawDialog : null,
+                            ontap: canWithdraw ? () => _showWithdrawDialog() : null,
                             child: Container(
                               alignment: Alignment.center,
                               height: 5.5.h,
                               width: 88.w,
                               decoration: BoxDecoration(
-                                color: canWithdraw ? Color(0xff10B66D) : Colors.grey,
+                                color: canWithdraw ? Color(0xff10B66D) : Colors.grey[400],
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Text(
-                                canWithdraw ? "Withdraw Application" : statusText,
+                                applicationData != null && applicationData!['status'] == 'withdrawn'
+                                    ? "Withdrawn"
+                                    : "Withdraw Application",
                                 style: GoogleFonts.plusJakartaSans(
                                   color: Colors.white,
                                   fontSize: 15.sp,

@@ -345,10 +345,13 @@ class _VendorJobsDetailPageState extends State<VendorJobsDetailPage> {
                                     ),
                                   )
                                 else
+
                                   Column(
                                     children: currentCandidates.map((app) {
                                       final user = app['user'];
                                       final data = app['appData'];
+
+                                      bool isWithdrawn = data['status'] == 'withdrawn';
 
                                       return Container(
                                         height: 24.h,
@@ -377,52 +380,43 @@ class _VendorJobsDetailPageState extends State<VendorJobsDetailPage> {
                                               children: [
                                                 onPress(
                                                   ontap: () => Get.to(
-                                                    () => VendorProfileView(user: user),
+                                                        () => VendorProfileView(user: user),
                                                   ),
                                                   child: CircleAvatar(
                                                     radius: 2.5.h,
                                                     backgroundColor:
-                                                        Colors.grey[200],
+                                                    Colors.grey[200],
                                                     backgroundImage:
-                                                        user.image.isNotEmpty
+                                                    user.image.isNotEmpty
                                                         ? CachedNetworkImageProvider(
-                                                            user.image,
-                                                          )
+                                                      user.image,
+                                                    )
                                                         : null,
                                                   ),
                                                 ),
                                                 SizedBox(width: 3.w),
                                                 Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       "${user.firstName} ${user.lastName}",
-                                                      style:
-                                                          GoogleFonts.plusJakartaSans(
-                                                            color: Color(
-                                                              0xff1E1E1E,
-                                                            ),
-                                                            fontSize: 15.sp,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                      style: GoogleFonts.plusJakartaSans(
+                                                        color: Color(0xff1E1E1E),
+                                                        fontSize: 15.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                     Text(
-                                                      "${user.experience} Years Experience",
-                                                      style:
-                                                          GoogleFonts.plusJakartaSans(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                  97,
-                                                                  30,
-                                                                  30,
-                                                                  30,
-                                                                ),
-                                                            fontSize: 14.sp,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                      isWithdrawn
+                                                          ? "Application Withdrawn"
+                                                          : "${user.experience} Years Experience",
+                                                      style: GoogleFonts.plusJakartaSans(
+                                                        color: isWithdrawn
+                                                            ? Color(0xffFF6347)
+                                                            : Color.fromARGB(97, 30, 30, 30),
+                                                        fontSize: 14.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -432,54 +426,46 @@ class _VendorJobsDetailPageState extends State<VendorJobsDetailPage> {
                                             Text(
                                               data['message'] ?? "No message",
                                               style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    color: Color.fromARGB(
-                                                      97,
-                                                      30,
-                                                      30,
-                                                      30,
-                                                    ),
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                              GoogleFonts.plusJakartaSans(
+                                                color: Color.fromARGB(
+                                                  97,
+                                                  30,
+                                                  30,
+                                                  30,
+                                                ),
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                               textAlign: TextAlign.start,
                                             ),
                                             SizedBox(height: 2.h),
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                               children: [
                                                 onPress(
-                                                  ontap: () => controller
-                                                      .openVendorCV(user.cv),
+                                                  ontap: isWithdrawn ? null : () => controller.openVendorCV(user.cv),
                                                   child: Container(
                                                     height: 3.6.h,
                                                     width: 25.w,
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
-                                                      color: Color(0xff1E1E1E),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            22,
-                                                          ),
+                                                      color: isWithdrawn ? Colors.grey : Color(0xff1E1E1E),
+                                                      borderRadius: BorderRadius.circular(22),
                                                     ),
                                                     child: Text(
                                                       "Download CV",
-                                                      style:
-                                                          GoogleFonts.plusJakartaSans(
-                                                            color: Color(
-                                                              0xffFFFFFF,
-                                                            ),
-                                                            fontSize: 13.sp,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                      style: GoogleFonts.plusJakartaSans(
+                                                        color: Colors.white,
+                                                        fontSize: 13.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
                                                 SizedBox(width: 4.w),
                                                 onPress(
-                                                  ontap: () => Get.to(() => ChatScreenView(
+                                                  ontap: isWithdrawn ? null : () => Get.to(() => ChatScreenView(
                                                     receiverId: user.id,
                                                     receiverName: "${user.firstName} ${user.lastName}",
                                                     receiverImage: user.image,
@@ -490,23 +476,16 @@ class _VendorJobsDetailPageState extends State<VendorJobsDetailPage> {
                                                     width: 25.w,
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
-                                                      color: Color(0xff10B66D),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            22,
-                                                          ),
+                                                      color: isWithdrawn ? Colors.grey : Color(0xff10B66D),
+                                                      borderRadius: BorderRadius.circular(22),
                                                     ),
                                                     child: Text(
                                                       "Chat",
-                                                      style:
-                                                          GoogleFonts.plusJakartaSans(
-                                                            color: Color(
-                                                              0xffFFFFFF,
-                                                            ),
-                                                            fontSize: 13.sp,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                      style: GoogleFonts.plusJakartaSans(
+                                                        color: Colors.white,
+                                                        fontSize: 13.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),

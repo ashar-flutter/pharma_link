@@ -132,8 +132,7 @@ class JobsAppliedPageState extends State<JobsAppliedPage> {
 
                             return onPress(
                               ontap: () {
-                                Get.to(DetailPage(job: job));
-                              },
+                                Get.to(DetailPage(job: job, jobId: application['jobId']));                              },
                               child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 10),
                                 height: 16.h,

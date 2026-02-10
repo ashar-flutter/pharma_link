@@ -3,7 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:linkpharma/controller/filter_controller.dart';
+import 'package:linkpharma/controller/notification_controller.dart';
 import 'package:linkpharma/page/auth/splash_screen.dart';
+import 'package:linkpharma/services/notification_service.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'config/online_status_manager.dart';
@@ -15,7 +18,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  NotificationService().initialize();
   runApp(const MyApp());
 }
 
@@ -68,6 +71,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     Get.put(JobController());
     Get.put(ChatController());
+    Get.put(FilterController());
+    Get.put(NotificationController());
     return ResponsiveSizer(
       builder: (BuildContext context, orientation, screenType) {
         return GetMaterialApp(
